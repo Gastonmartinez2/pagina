@@ -124,10 +124,6 @@
         #flavor-choice {
             display: none;
         }
-        #carb-sources, #fiber-sources {
-            display: grid;
-            gap: 10px;
-        }
         footer {
             text-align: center;
             padding: 20px;
@@ -223,7 +219,7 @@
 
         <section id="meal-planner">
             <h2>Planificador de Comidas 🥘</h2>
-            <p>Selecciona el tipo de comida y personaliza tus opciones. Puedes elegir múltiples fuentes de carbohidratos y fibra; las cantidades se distribuirán equitativamente para cumplir con los macros. Para almuerzo o cena, incluye frutas como postre si prefieres menos ensalada. Cantidades redondeadas para facilitar el pesaje. Nota: Las cantidades se refieren a alimentos cocidos, a menos que se especifique "crudos". Para carnes y proteínas, pesa crudo; para carbs como arroz o legumbres, considera el estado indicado (cocido o crudo).</p>
+            <p>Selecciona el tipo de comida y personalizadas tus opciones. Puedes elegir hasta 3 fuentes de carbohidratos y fibra (la primera es obligatoria, las otras opcionales). Las cantidades se distribuirán con más peso en el principal (primero seleccionado). Para frutas en fibra, se sugieren unidades enteras. Todas las cantidades se dan en peso crudo, con macros ajustados accordingly. Cantidades redondeadas para facilitar el pesaje (a múltiplos de 5 o 10).</p>
 
             <label>Tipo de Comida:</label>
             <select id="meal-type" onchange="updateFlavorChoice()">
@@ -246,24 +242,26 @@
             <label>Fuente de Proteína:</label>
             <select id="protein-source"></select>
 
-            <label>Fuentes de Carbohidrato (elige hasta 3):</label>
-            <div id="carb-sources">
-                <select id="carb-source1"></select>
-                <select id="carb-source2" style="display: none;"></select>
-                <select id="carb-source3" style="display: none;"></select>
-                <button type="button" onclick="addCarbSelect()">Agregar otro carb</button>
-            </div>
+            <label>Carbohidrato 1 (principal, obligatorio):</label>
+            <select id="carb-source1" required></select>
+
+            <label>Carbohidrato 2 (opcional):</label>
+            <select id="carb-source2"></select>
+
+            <label>Carbohidrato 3 (opcional):</label>
+            <select id="carb-source3"></select>
 
             <label>Fuente de Grasa Saludable:</label>
             <select id="fat-source"></select>
 
-            <label>Fuentes de Fibra (elige hasta 3):</label>
-            <div id="fiber-sources">
-                <select id="fiber-source1"></select>
-                <select id="fiber-source2" style="display: none;"></select>
-                <select id="fiber-source3" style="display: none;"></select>
-                <button type="button" onclick="addFiberSelect()">Agregar otra fibra</button>
-            </div>
+            <label>Fibra 1 (principal, obligatoria):</label>
+            <select id="fiber-source1" required></select>
+
+            <label>Fibra 2 (opcional):</label>
+            <select id="fiber-source2"></select>
+
+            <label>Fibra 3 (opcional):</label>
+            <select id="fiber-source3"></select>
 
             <button type="button" onclick="calculateMeal()">Calcular Cantidades para esta Comida</button>
 
@@ -272,7 +270,7 @@
 
         <section id="meal-ideas">
             <h2>Ideas de Comidas Saludables 🍽️</h2>
-            <p>Aquí hay algunas ideas integrando alimentos en cantidades aproximadas basadas en tus macros. Ajusta según tus preferencias.</p>
+            <p>Aquí hay algunas ideas integrando alimentos en cantidades aproximadas basadas en tus macros. Ajusta según tus preferencias. Para desayunos y meriendas, considera infusiones como café, té, mate, mate cocido o leche.</p>
             <ul id="ideas-list"></ul>
         </section>
     </main>
@@ -282,20 +280,17 @@
     </footer>
 
     <script>
-        let carbSelectCount = 1;
-        let fiberSelectCount = 1;
-
         // Protein sources
         const proteinSources = {
             common: [
-                {name: 'Carne magra', prot: 21, unit: '100g', unitName: 'g'}, 
-                {name: 'Carne de cerdo', prot: 21, unit: '100g', unitName: 'g'},
-                {name: 'Pollo muslo', prot: 18, unit: '100g', unitName: 'g'}, 
-                {name: 'Pechuga de pollo', prot: 22, unit: '100g', unitName: 'g'}, 
+                {name: 'Carne magra (cruda)', prot: 21, unit: '100g', unitName: 'g'}, 
+                {name: 'Carne de cerdo (cruda)', prot: 21, unit: '100g', unitName: 'g'},
+                {name: 'Pollo muslo (crudo)', prot: 18, unit: '100g', unitName: 'g'}, 
+                {name: 'Pechuga de pollo (cruda)', prot: 22, unit: '100g', unitName: 'g'}, 
                 {name: 'Huevos', prot: 6, unit: 'unit', unitName: 'huevos'},
-                {name: 'Pescado (atún/caballa/rio)', prot: 24, unit: '100g', unitName: 'g'},
-                {name: 'Tofu', prot: 8, unit: '100g', unitName: 'g'}, // Added
-                {name: 'Queso cottage', prot: 11, unit: '100g', unitName: 'g'} // Added
+                {name: 'Pescado (atún/caballa/rio, crudo)', prot: 24, unit: '100g', unitName: 'g'},
+                {name: 'Tofu', prot: 8, unit: '100g', unitName: 'g'},
+                {name: 'Queso cottage', prot: 11, unit: '100g', unitName: 'g'}
             ],
             breakfastSnack: [
                 {name: 'Yogur griego', prot: 10, unit: '100g', unitName: 'g'}, 
@@ -303,79 +298,77 @@
             ]
         };
 
-        // Carb sources - Added more
+        // Carb sources - Adjusted to raw where appropriate, carb values for raw
         const carbSources = [
-            {name: 'Arroz blanco cocido', carb: 77.5, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Arroz integral cocido', carb: 73, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Fideos secos', carb: 73.5, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Avena arrollada', carb: 63, unit: '100g', unitName: 'g', type: 'both'},
-            {name: 'Harina de trigo', carb: 75.5, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Polenta', carb: 79, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Papa cocida', carb: 18.5, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Batata cocida', carb: 20.5, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Mandioca cocida', carb: 39, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Zapallo cocido', carb: 7, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Arroz blanco (crudo)', carb: 78, unit: '100g', unitName: 'g', type: 'salty'}, // Raw carb
+            {name: 'Arroz integral (crudo)', carb: 74, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Fideos (crudos)', carb: 75, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Avena arrollada (cruda)', carb: 66, unit: '100g', unitName: 'g', type: 'both'},
+            {name: 'Harina de trigo', carb: 76, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Polenta (cruda)', carb: 80, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Papa (cruda)', carb: 17, unit: '100g', unitName: 'g', type: 'salty'}, // Raw carb
+            {name: 'Batata (cruda)', carb: 20, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Mandioca (cruda)', carb: 38, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Zapallo (crudo)', carb: 7, unit: '100g', unitName: 'g', type: 'salty'},
             {name: 'Pan blanco', carb: 49, unit: '100g', unitName: 'g', type: 'both'},
-            {name: 'Pan integral', carb: 43.5, unit: '100g', unitName: 'g', type: 'both'},
-            {name: 'Pan de molde', carb: 46.5, unit: '100g', unitName: 'g', type: 'both'},
-            {name: 'Tortilla de trigo', carb: 52.5, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Pan integral', carb: 43, unit: '100g', unitName: 'g', type: 'both'},
+            {name: 'Pan de molde', carb: 46, unit: '100g', unitName: 'g', type: 'both'},
+            {name: 'Tortilla de trigo', carb: 53, unit: '100g', unitName: 'g', type: 'salty'},
             {name: 'Galletas de arroz', carb: 81, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Banana', carb: 22.5, unit: '100g', unitName: 'g', type: 'sweet'},
-            {name: 'Manzana', carb: 13.5, unit: '100g', unitName: 'g', type: 'sweet'},
-            {name: 'Lentejas cocidas', carb: 20, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Garbanzos cocidos', carb: 20, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Porotos cocidos', carb: 20, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Lentejas crudas', carb: 57.5, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Garbanzos crudos', carb: 60.5, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Porotos crudos', carb: 61, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Quinua cocida', carb: 21, unit: '100g', unitName: 'g', type: 'salty'}, // Added
-            {name: 'Pasta cocida', carb: 31, unit: '100g', unitName: 'g', type: 'salty'}, // Added
-            {name: 'Maíz cocido', carb: 19, unit: '100g', unitName: 'g', type: 'salty'}, // Added
-            {name: 'Kiwi', carb: 15, unit: '100g', unitName: 'g', type: 'sweet'}, // Added
-            {name: 'Uvas', carb: 18, unit: '100g', unitName: 'g', type: 'sweet'} // Added
+            {name: 'Banana', carb: 23, unit: '100g', unitName: 'g', type: 'sweet'},
+            {name: 'Manzana', carb: 14, unit: '100g', unitName: 'g', type: 'sweet'},
+            {name: 'Lentejas (crudas)', carb: 58, unit: '100g', unitName: 'g', type: 'salty'}, // Raw
+            {name: 'Garbanzos (crudos)', carb: 61, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Porotos (crudos)', carb: 62, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Quinua (cruda)', carb: 64, unit: '100g', unitName: 'g', type: 'salty'}, // Raw
+            {name: 'Pasta (cruda)', carb: 75, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Maíz (crudo)', carb: 74, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Kiwi', carb: 15, unit: '100g', unitName: 'g', type: 'sweet'},
+            {name: 'Uvas', carb: 18, unit: '100g', unitName: 'g', type: 'sweet'}
         ];
 
-        // Fat sources - Added more
+        // Fat sources
         const fatSources = [
             {name: 'Aceite (1 cda ~10g grasa)', fat: 100, unit: '100g', unitName: 'g'},
-            {name: 'Palta', fat: 14.5, unit: '100g', unitName: 'g'},
-            {name: 'Aceitunas', fat: 12.5, unit: '100g', unitName: 'g'},
-            {name: 'Almendras', fat: 49.5, unit: '100g', unitName: 'g'},
+            {name: 'Palta', fat: 15, unit: '100g', unitName: 'g'},
+            {name: 'Aceitunas', fat: 13, unit: '100g', unitName: 'g'},
+            {name: 'Almendras', fat: 50, unit: '100g', unitName: 'g'},
             {name: 'Nueces', fat: 65, unit: '100g', unitName: 'g'},
             {name: 'Maní', fat: 49, unit: '100g', unitName: 'g'},
             {name: 'Castañas de cajú', fat: 44, unit: '100g', unitName: 'g'},
-            {name: 'Chía', fat: 30.5, unit: '100g', unitName: 'g'},
+            {name: 'Chía', fat: 31, unit: '100g', unitName: 'g'},
             {name: 'Lino', fat: 42, unit: '100g', unitName: 'g'},
-            {name: 'Sésamo', fat: 49, unit: '100g', unitName: 'g'},
+            {name: 'Sésamo', fat: 50, unit: '100g', unitName: 'g'},
             {name: 'Girasol', fat: 50, unit: '100g', unitName: 'g'},
-            {name: 'Mantequilla de maní', fat: 50, unit: '100g', unitName: 'g'}, // Added
-            {name: 'Coco rallado', fat: 33, unit: '100g', unitName: 'g'} // Added
+            {name: 'Mantequilla de maní', fat: 50, unit: '100g', unitName: 'g'},
+            {name: 'Coco rallado', fat: 33, unit: '100g', unitName: 'g'}
         ];
 
-        // Fiber sources - Added more
+        // Fiber sources, with average unit sizes for fruits
         const fiberSources = [
-            {name: 'Tomate', fiber: 1.2, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Lechuga', fiber: 1.3, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Brócoli', fiber: 2.6, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Espinacas', fiber: 2.2, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Zanahoria', fiber: 2.8, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Pepino', fiber: 0.5, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Pimiento', fiber: 1.7, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Zapallo', fiber: 1.0, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Ensalada mixta (lechuga + tomate + pepino)', fiber: 1.0, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Banana (postre)', fiber: 2.6, unit: '100g', unitName: 'g', type: 'sweet'},
-            {name: 'Manzana (postre)', fiber: 2.4, unit: '100g', unitName: 'g', type: 'sweet'},
-            {name: 'Naranja (postre)', fiber: 2.4, unit: '100g', unitName: 'g', type: 'sweet'},
-            {name: 'Fresa (postre)', fiber: 2.0, unit: '100g', unitName: 'g', type: 'sweet'},
-            {name: 'Pera (postre)', fiber: 3.1, unit: '100g', unitName: 'g', type: 'sweet'},
-            {name: 'Coliflor', fiber: 2.0, unit: '100g', unitName: 'g', type: 'salty'}, // Added
-            {name: 'Remolacha', fiber: 2.8, unit: '100g', unitName: 'g', type: 'salty'}, // Added
-            {name: 'Kiwi (postre)', fiber: 3.0, unit: '100g', unitName: 'g', type: 'sweet'}, // Added
-            {name: 'Piña (postre)', fiber: 1.4, unit: '100g', unitName: 'g', type: 'sweet'} // Added
+            {name: 'Tomate', fiber: 1.2, unit: '100g', unitName: 'g', type: 'salty', isFruit: false},
+            {name: 'Lechuga', fiber: 1.3, unit: '100g', unitName: 'g', type: 'salty', isFruit: false},
+            {name: 'Brócoli', fiber: 2.6, unit: '100g', unitName: 'g', type: 'salty', isFruit: false},
+            {name: 'Espinacas', fiber: 2.2, unit: '100g', unitName: 'g', type: 'salty', isFruit: false},
+            {name: 'Zanahoria', fiber: 2.8, unit: '100g', unitName: 'g', type: 'salty', isFruit: false},
+            {name: 'Pepino', fiber: 0.5, unit: '100g', unitName: 'g', type: 'salty', isFruit: false},
+            {name: 'Pimiento', fiber: 1.7, unit: '100g', unitName: 'g', type: 'salty', isFruit: false},
+            {name: 'Zapallo', fiber: 1.0, unit: '100g', unitName: 'g', type: 'salty', isFruit: false},
+            {name: 'Ensalada mixta (lechuga + tomate + pepino)', fiber: 1.0, unit: '100g', unitName: 'g', type: 'salty', isFruit: false},
+            {name: 'Banana (postre)', fiber: 2.6, unit: '100g', unitName: 'unidades (120g c/u approx)', type: 'sweet', isFruit: true, avgSize: 120},
+            {name: 'Manzana (postre)', fiber: 2.4, unit: '100g', unitName: 'unidades (150g c/u approx)', type: 'sweet', isFruit: true, avgSize: 150},
+            {name: 'Naranja (postre)', fiber: 2.4, unit: '100g', unitName: 'unidades (200g c/u approx)', type: 'sweet', isFruit: true, avgSize: 200},
+            {name: 'Fresa (postre)', fiber: 2.0, unit: '100g', unitName: 'unidades (15g c/u approx)', type: 'sweet', isFruit: true, avgSize: 15},
+            {name: 'Pera (postre)', fiber: 3.1, unit: '100g', unitName: 'unidades (150g c/u approx)', type: 'sweet', isFruit: true, avgSize: 150},
+            {name: 'Coliflor', fiber: 2.0, unit: '100g', unitName: 'g', type: 'salty', isFruit: false},
+            {name: 'Remolacha', fiber: 2.8, unit: '100g', unitName: 'g', type: 'salty', isFruit: false},
+            {name: 'Kiwi (postre)', fiber: 3.0, unit: '100g', unitName: 'unidades (75g c/u approx)', type: 'sweet', isFruit: true, avgSize: 75},
+            {name: 'Piña (postre)', fiber: 1.4, unit: '100g', unitName: 'unidades (porciones de 150g approx)', type: 'sweet', isFruit: true, avgSize: 150}
         ];
 
         // Populate selects
-        function populateSelect(select, sources) {
+        function populateSelect(selectId, sources) {
+            const select = document.getElementById(selectId);
             select.innerHTML = '<option value="">Selecciona...</option>';
             sources.forEach(source => {
                 const option = document.createElement('option');
@@ -385,25 +378,7 @@
             });
         }
 
-        populateSelect(document.getElementById('fat-source'), fatSources);
-
-        // Add carb select
-        function addCarbSelect() {
-            if (carbSelectCount < 3) {
-                carbSelectCount++;
-                document.getElementById(`carb-source${carbSelectCount}`).style.display = 'block';
-                updateOptions(); // Repopulate
-            }
-        }
-
-        // Add fiber select
-        function addFiberSelect() {
-            if (fiberSelectCount < 3) {
-                fiberSelectCount++;
-                document.getElementById(`fiber-source${fiberSelectCount}`).style.display = 'block';
-                updateOptions(); // Repopulate
-            }
-        }
+        populateSelect('fat-source', fatSources);
 
         // Update flavor choice visibility
         function updateFlavorChoice() {
@@ -439,7 +414,7 @@
             if (mealType === 'breakfast' || mealType === 'snack' || mealType === 'colacion') {
                 proteins = proteins.concat(proteinSources.breakfastSnack);
             }
-            populateSelect(document.getElementById('protein-source'), proteins);
+            populateSelect('protein-source', proteins);
 
             // Carbs
             let carbFilter = carbSources;
@@ -450,9 +425,9 @@
             } else {
                 carbFilter = carbSources.filter(c => c.type === 'salty' || c.type === 'both');
             }
-            for (let i = 1; i <= 3; i++) {
-                populateSelect(document.getElementById(`carb-source${i}`), carbFilter);
-            }
+            populateSelect('carb-source1', carbFilter);
+            populateSelect('carb-source2', carbFilter);
+            populateSelect('carb-source3', carbFilter);
 
             // Fiber
             let fiberFilter = fiberSources;
@@ -463,9 +438,9 @@
             } else {
                 fiberFilter = fiberSources.filter(f => f.type === 'salty');
             }
-            for (let i = 1; i <= 3; i++) {
-                populateSelect(document.getElementById(`fiber-source${i}`), fiberFilter);
-            }
+            populateSelect('fiber-source1', fiberFilter);
+            populateSelect('fiber-source2', fiberFilter);
+            populateSelect('fiber-source3', fiberFilter);
         }
 
         function calculateBMR(weight, height, age, gender) {
@@ -513,22 +488,22 @@
             const activityMultiplier = getActivityMultiplier(activityDays, activityDuration);
             const tdee = bmr * activityMultiplier;
 
-            // Protein: Use 2 g/kg as reference
+            // Protein: 1.6-2.2, use 2 as reference
             const dailyProtein = 2 * weight;
 
-            // Carbs: Adjusted ranges
+            // Carbs: Adjusted
             let carbMultiplier;
             const isHighTraining = (activityDays >= 5 && activityDuration >= 60);
             if (objective === 'loss') {
-                carbMultiplier = 2.5; // Midpoint 2-3
+                carbMultiplier = 2.5;
             } else if (objective === 'maintenance') {
-                carbMultiplier = 4; // Midpoint 3-5
+                carbMultiplier = 4;
             } else {
-                carbMultiplier = isHighTraining ? 6 : 5; // 5-7, higher for much training
+                carbMultiplier = isHighTraining ? 6 : 5;
             }
             const dailyCarb = carbMultiplier * weight;
 
-            // Fats: Keep previous, but can adjust if needed
+            // Fats
             let fatMultiplier;
             if (objective === 'loss') {
                 fatMultiplier = 0.7;
@@ -583,13 +558,13 @@
 
             // Get selected carbs
             const selectedCarbs = [];
-            for (let i = 1; i <= carbSelectCount; i++) {
+            for (let i = 1; i <= 3; i++) {
                 const carb = document.getElementById(`carb-source${i}`).value;
                 if (carb) selectedCarbs.push(JSON.parse(carb));
             }
 
             const selectedFibers = [];
-            for (let i = 1; i <= fiberSelectCount; i++) {
+            for (let i = 1; i <= 3; i++) {
                 const fiber = document.getElementById(`fiber-source${i}`).value;
                 if (fiber) selectedFibers.push(JSON.parse(fiber));
             }
@@ -601,29 +576,46 @@
             const mealFat = dailyFat / mealsPerDay;
             let mealFiber = dailyFiber / mealsPerDay;
 
-            const protQty = Math.round((mealProtein / (protSource.prot || 1)) * (protSource.unit === '100g' ? 100 : 1));
+            let protQty = (mealProtein / (protSource.prot || 1)) * (protSource.unit === '100g' ? 100 : 1);
+            protQty = Math.round(protQty / 10) * 10; // Round to nearest 10
 
-            // Carbs: Divide mealCarb equally among selected
+            // Carbs: Primary (first) gets 60%, others split remaining
             let carbResult = '';
             if (selectedCarbs.length > 0) {
-                const carbPerSource = mealCarb / selectedCarbs.length;
-                selectedCarbs.forEach(source => {
-                    const qty = Math.round((carbPerSource / source.carb) * (source.unit === '100g' ? 100 : 1));
+                const primaryPortion = 0.6;
+                const remainingPortion = 1 - primaryPortion;
+                const carbPerSecondary = selectedCarbs.length > 1 ? remainingPortion / (selectedCarbs.length - 1) : 0;
+                selectedCarbs.forEach((source, index) => {
+                    const portion = index === 0 ? primaryPortion : carbPerSecondary;
+                    const sourceCarb = portion * mealCarb;
+                    let qty = (sourceCarb / source.carb) * (source.unit === '100g' ? 100 : 1);
+                    qty = Math.round(qty / 5) * 5; // Round to nearest 5
                     carbResult += `${source.name}: ${qty} ${source.unitName}<br>`;
                 });
             }
 
-            const fatQty = Math.round((mealFat / (fatSource.fat || 1)) * (fatSource.unit === '100g' ? 100 : 1));
+            let fatQty = (mealFat / (fatSource.fat || 1)) * (fatSource.unit === '100g' ? 100 : 1);
+            fatQty = Math.round(fatQty / 5) * 5;
 
-            // Fiber: Divide mealFiber equally, cap 300g per source
+            // Fiber: Similar, primary 60%, and for fruits, suggest units
             let fiberResult = '';
             if (selectedFibers.length > 0) {
-                const fiberPerSource = mealFiber / selectedFibers.length;
-                selectedFibers.forEach(source => {
-                    let qty = Math.round((fiberPerSource / source.fiber) * (source.unit === '100g' ? 100 : 1));
+                const primaryPortion = 0.6;
+                const remainingPortion = 1 - primaryPortion;
+                const fiberPerSecondary = selectedFibers.length > 1 ? remainingPortion / (selectedFibers.length - 1) : 0;
+                selectedFibers.forEach((source, index) => {
+                    const portion = index === 0 ? primaryPortion : fiberPerSecondary;
+                    const sourceFiber = portion * mealFiber;
+                    let qty = (sourceFiber / source.fiber) * (source.unit === '100g' ? 100 : 1);
+                    qty = Math.round(qty / 5) * 5;
                     if (qty > 300) qty = 300;
-                    if (qty < 100) qty = 100;
-                    fiberResult += `${source.name}: ${qty} ${source.unitName}<br>`;
+                    if (qty < 50) qty = 50;
+                    let unitDisplay = source.unitName;
+                    if (source.isFruit) {
+                        const units = Math.round(qty / source.avgSize);
+                        unitDisplay = `${units} unidad(es) (approx ${qty}g)`;
+                    }
+                    fiberResult += `${source.name}: ${unitDisplay}<br>`;
                 });
             }
 
@@ -633,10 +625,10 @@
                 Carbohidratos:<br>${carbResult}
                 ${fatSource.name ? `${fatSource.name}: ${fatQty} ${fatSource.unitName}<br>` : ''}
                 Fibra:<br>${fiberResult}
-                <em>(Cantidades redondeadas y distribuidas equitativamente. Ajusta si necesitas.)</em>
+                <em>(Cantidades redondeadas y distribuidas con más peso en el principal. Pesaje en crudo.)</em>
             `;
 
-            // Generate meal ideas
+            // Generate meal ideas in Spanish
             generateMealIdeas(mealProtein, mealCarb, mealFat, mealFiber);
             document.getElementById('meal-ideas').style.display = 'block';
         }
@@ -645,11 +637,16 @@
             const ideasList = document.getElementById('ideas-list');
             ideasList.innerHTML = '';
             const ideas = [
-                `Sándwich de pechuga de pollo: 100g pechuga (22g prot), 50g pan integral (22g carb), 30g palta (4g grasa), ensalada mixta 150g (~2g fibra). Total approx: prot ${protein.toFixed(0)/4}, carb ${carb.toFixed(0)/4}, etc.`,
-                `Yogur con frutas: 150g yogur griego (15g prot), 100g banana (23g carb), 20g almendras (10g grasa), 100g fresas (2g fibra).`,
-                `Ensalada con atún: 100g atún (24g prot), 100g quinua (21g carb), 1 cda aceite (10g grasa), brócoli 200g (5g fibra).`,
-                `Batido post-entreno: Batido proteína (24g prot), 100g avena (63g carb), 20g chía (6g grasa), manzana 100g (2g fibra).`,
-                `Cena ligera: 100g salmón (20g prot, added more prot sources but using existing), 100g papa (19g carb), 50g aceitunas (6g grasa), espinacas 150g (3g fibra).`
+                `Sándwich de pechuga de pollo: 150g pechuga, 50g pan integral, 30g palta, ensalada mixta 150g.`,
+                `Yogur con frutas: 150g yogur griego, 100g banana, 20g almendras, 100g fresas.`,
+                `Ensalada con atún: 100g atún, 100g quinua (cruda), 1 cda aceite, brócoli 200g.`,
+                `Batido post-entreno: 1 serving batido proteína, 100g avena (cruda), 20g chía, manzana 150g.`,
+                `Cena ligera: 100g salmón (crudo), 100g papa (cruda), 50g aceitunas, espinacas 150g.`,
+                `Tarta de verduras: 100g queso cottage, 100g harina de trigo, 30g nueces, zanahoria 200g y espinacas 100g.`,
+                `Desayuno completo: 2 huevos, 50g pan integral, 30g mantequilla de maní, con mate o café.`,
+                `Merienda dulce: 150g yogur griego, 100g piña, 20g coco rallado, con té o mate cocido.`,
+                `Almuerzo vegetariano: 100g tofu, 100g pasta (cruda), 1 cda aceite, coliflor 200g.`,
+                `Colación rápida: 1 banana, 20g maní, con leche o infusión.`
             ];
             ideas.forEach(idea => {
                 const li = document.createElement('li');
