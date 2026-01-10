@@ -267,8 +267,8 @@
 
             <div class="macro-group">
                 <div>
-                    <label>Fibra 1 (principal, obligatoria):</label>
-                    <select id="fiber-source1" required></select>
+                    <label id="fiber-label1">Fibra 1 (principal):</label>
+                    <select id="fiber-source1"></select>
                 </div>
                 <div>
                     <label>Fibra 2 (opcional):</label>
@@ -293,7 +293,7 @@
     </footer>
 
     <script>
-        // Protein sources - Added new
+        // Protein sources
         const proteinSources = {
             common: [
                 {name: 'Carne magra (cruda)', prot: 21, unit: '100g', unitName: 'g'}, 
@@ -313,7 +313,7 @@
             ]
         };
 
-        // Carb sources - With isFruit for unit display
+        // Carb sources
         const carbSources = [
             {name: 'Arroz blanco (crudo)', carb: 78, unit: '100g', unitName: 'g', type: 'salty', isFruit: false},
             {name: 'Arroz integral (crudo)', carb: 74, unit: '100g', unitName: 'g', type: 'salty', isFruit: false},
@@ -342,7 +342,7 @@
             {name: 'Uvas', carb: 18, unit: '100g', unitName: 'g', type: 'sweet', isFruit: false}
         ];
 
-        // Fat sources
+        // Fat sources - Added frutos secos mixtos
         const fatSources = [
             {name: 'Aceite (1 cda ~10g grasa)', fat: 100, unit: '100g', unitName: 'g'},
             {name: 'Palta', fat: 15, unit: '100g', unitName: 'g'},
@@ -356,10 +356,11 @@
             {name: 'Sésamo', fat: 50, unit: '100g', unitName: 'g'},
             {name: 'Girasol', fat: 50, unit: '100g', unitName: 'g'},
             {name: 'Mantequilla de maní', fat: 50, unit: '100g', unitName: 'g'},
-            {name: 'Coco rallado', fat: 33, unit: '100g', unitName: 'g'}
+            {name: 'Coco rallado', fat: 33, unit: '100g', unitName: 'g'},
+            {name: 'Frutos secos mixtos', fat: 50, unit: '100g', unitName: 'g'} // Added
         ];
 
-        // Fiber sources - Added fruits nuts as general option
+        // Fiber sources
         const fiberSources = [
             {name: 'Tomate', fiber: 1.2, unit: '100g', unitName: 'g', type: 'salty', isFruit: false},
             {name: 'Lechuga', fiber: 1.3, unit: '100g', unitName: 'g', type: 'salty', isFruit: false},
@@ -418,6 +419,19 @@
                 flavorDiv.style.display = 'none';
             }
             updateOptions();
+            updateFiberRequirement(mealType);
+        }
+
+        function updateFiberRequirement(mealType) {
+            const fiberLabel1 = document.getElementById('fiber-label1');
+            const fiberSelect1 = document.getElementById('fiber-source1');
+            if (mealType === 'breakfast' || mealType === 'snack' || mealType === 'colacion') {
+                fiberLabel1.textContent = 'Fibra 1 (opcional):';
+                fiberSelect1.required = false;
+            } else {
+                fiberLabel1.textContent = 'Fibra 1 (principal, obligatoria):';
+                fiberSelect1.required = true;
+            }
         }
 
         // Update options based on meal type and flavor
@@ -575,13 +589,13 @@
             const selectedCarbs = [];
             for (let i = 1; i <= 2; i++) {
                 const carb = document.getElementById(`carb-source${i}`).value;
-                if (carb && i === 1 || carb) selectedCarbs.push(JSON.parse(carb));
+                if (carb) selectedCarbs.push(JSON.parse(carb));
             }
 
             const selectedFibers = [];
             for (let i = 1; i <= 2; i++) {
                 const fiber = document.getElementById(`fiber-source${i}`).value;
-                if (fiber && i === 1 || fiber) selectedFibers.push(JSON.parse(fiber));
+                if (fiber) selectedFibers.push(JSON.parse(fiber));
             }
 
             const fatSource = JSON.parse(document.getElementById('fat-source').value || '{}');
@@ -669,10 +683,10 @@
             if (mealType === 'breakfast') {
                 titleText = 'Ideas de Desayunos Saludables';
                 ideas = [
-                    'Panqueques de proteína: 1 porción panqueques de proteína, 1 banana, 20g almendras, con café o té.',
-                    'Yogur con frutas: 150g yogur griego, 1 manzana, 30g chía, con mate cocido o leche.',
-                    'Huevos con pan: 2 huevos, 50g pan integral, 30g palta, espinacas 100g, con café.',
-                    'Batido: 1 batido de proteína, 1 banana, 20g nueces, con té.'
+                    'Desayuno equilibrado: 2 huevos, 50g pan integral, 30g palta, 100g tomate, con café o té.',
+                    'Yogur con frutas: 150g yogur griego, 1 banana, 20g almendras, con mate cocido o leche.',
+                    'Panqueques: 1 porción panqueques de proteína, 1 manzana, 30g mantequilla de maní, con café.',
+                    'Batido: 1 batido de proteína, 50g avena, 20g chía, con té.'
                 ];
             } else if (mealType === 'snack' || mealType === 'colacion') {
                 titleText = 'Ideas de Meriendas/Colaciones Saludables';
@@ -680,7 +694,7 @@
                     'Barrita con fruta: 1 barrita de proteína, 1 kiwi, 20g maní, con mate o té.',
                     'Yogur simple: 150g yogur griego, 100g fresas, 30g lino, con mate cocido.',
                     'Tostada: 50g pan integral, 30g mantequilla de maní, 1 pera, con café.',
-                    'Frutos secos mixtos: 30g almendras, 1 manzana, con leche.'
+                    'Frutos secos: 30g frutos secos mixtos, 1 manzana, con leche.'
                 ];
             } else if (mealType === 'lunch') {
                 titleText = 'Ideas de Almuerzos Saludables';
@@ -701,16 +715,16 @@
             } else {
                 titleText = 'Ideas de Comidas Saludables';
                 ideas = [
+                    'Desayuno equilibrado: 2 huevos, 50g pan integral, 30g palta, 100g tomate, con café o té.',
+                    'Yogur con frutas: 150g yogur griego, 1 banana, 20g almendras, con mate cocido o leche.',
                     'Sándwich de pechuga de pollo: 150g pechuga de pollo, 50g pan integral, 30g palta, ensalada mixta 150g.',
-                    'Yogur con frutas: 150g yogur griego, 1 banana, 20g almendras, 100g fresas.',
-                    'Ensalada con atún: 100g atún, 100g quinua, 1 cda aceite, brócoli 200g.',
                     'Batido post-entreno: 1 batido de proteína, 100g avena, 20g chía, 1 manzana.',
                     'Cena ligera: 100g pescado, 100g papa, 50g aceitunas, espinacas 150g.',
                     'Tarta de verduras: 100g queso cottage, 100g harina de trigo, 30g nueces, zanahoria 200g y espinacas 100g.',
-                    'Desayuno completo: 2 huevos, 50g pan integral, 30g mantequilla de maní, con mate o café.',
                     'Merienda dulce: 150g yogur griego, 100g piña, 30g coco rallado, con té o mate cocido.',
                     'Almuerzo vegetariano: 100g tofu, 100g pasta, 1 cda aceite, coliflor 200g.',
-                    'Colación rápida: 1 banana, 20g maní, con leche o infusión.'
+                    'Colación rápida: 1 banana, 20g maní, con leche o infusión.',
+                    'Panqueques: 1 porción panqueques de proteína, 1 manzana, 30g mantequilla de maní, con café.'
                 ];
             }
 
