@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NutriFit Guide: Tu Asistente Personal para Comidas Saludables</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            background: linear-gradient(135deg, #d4f4e2 0%, #e8f5e9 100%);
             color: #333;
             line-height: 1.6;
             min-height: 100vh;
@@ -21,7 +20,7 @@
         header {
             text-align: center;
             padding: 40px 20px;
-            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             color: white;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             border-bottom-left-radius: 20px;
@@ -44,7 +43,7 @@
             flex: 1;
         }
         h2, h3 {
-            color: #388e3c;
+            color: #2f855a;
             font-weight: 600;
         }
         section {
@@ -65,7 +64,7 @@
         }
         label {
             font-weight: 600;
-            color: #455a64;
+            color: #4a5568;
             display: flex;
             align-items: center;
         }
@@ -75,18 +74,18 @@
         }
         input, select, button {
             padding: 12px;
-            border: 1px solid #ccc;
+            border: 1px solid #cbd5e0;
             border-radius: 8px;
             font-size: 1em;
             transition: border-color 0.3s, box-shadow 0.3s;
         }
         input:focus, select:focus {
-            border-color: #4caf50;
-            box-shadow: 0 0 5px rgba(76,175,80,0.5);
+            border-color: #48bb78;
+            box-shadow: 0 0 5px rgba(72,187,120,0.5);
             outline: none;
         }
         button {
-            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             color: white;
             cursor: pointer;
             font-weight: 600;
@@ -94,23 +93,29 @@
             transition: background 0.3s, transform 0.2s;
         }
         button:hover {
-            background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%);
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
             transform: scale(1.02);
         }
         #macros {
-            background: #f9fff9;
-            border-left: 5px solid #4caf50;
+            background: #f0fff4;
+            border-left: 5px solid #48bb78;
         }
         #macros p {
             margin: 10px 0;
             font-size: 1.1em;
         }
+        #user-summary {
+            background: #ebf8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
         #meal-result {
             margin-top: 20px;
             padding: 15px;
-            background: #f0f8ff;
+            background: #f0fff4;
             border-radius: 8px;
-            border: 1px solid #d3e0ea;
+            border: 1px solid #c6f6d5;
         }
         .emoji {
             font-size: 1.2em;
@@ -119,24 +124,13 @@
         #flavor-choice {
             display: none;
         }
-        #bmi-info {
-            margin-top: 20px;
-        }
-        #avatar-container {
-            width: 200px;
-            height: 300px;
-            margin: 20px auto;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            overflow: hidden;
-        }
         footer {
             text-align: center;
             padding: 20px;
-            color: #777;
+            color: #718096;
             font-size: 0.9em;
-            background: #f9f9f9;
-            border-top: 1px solid #eee;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
         }
     </style>
 </head>
@@ -204,18 +198,15 @@
         </section>
 
         <section id="macros" style="display: none;">
-            <h2>Tus Macros Diarios Aproximados 🍎</h2>
+            <h2>Resumen de Tus Datos Personales 📋</h2>
+            <div id="user-summary"></div>
+
+            <h3>Tus Macros Diarios Aproximados 🍎</h3>
             <p>Basado en tus datos, aquí están tus requerimientos diarios estimados. Recuerda consultar a un profesional para ajustes precisos.</p>
             <p>Proteínas: <span id="protein">0</span> g</p>
             <p>Carbohidratos: <span id="carb">0</span> g</p>
             <p>Grasas Saludables: <span id="fat">0</span> g</p>
             <p>Fibra: <span id="fiber">0</span> g</p>
-            <div id="bmi-info">
-                <p>IMC: <span id="bmi">0</span> (Categoría: <span id="bmi-category"></span>)</p>
-                <div id="avatar-container">
-                    <canvas id="avatar-canvas"></canvas>
-                </div>
-            </div>
             <p><em>Nota: Estos cálculos consideran tu peso, objetivo y actividad. Usa el planificador para distribuir en comidas.</em></p>
         </section>
 
@@ -227,6 +218,7 @@
             <select id="meal-type" onchange="updateFlavorChoice()">
                 <option value="">Selecciona...</option>
                 <option value="breakfast">Desayuno</option>
+                <option value="colacion">Colación</option>
                 <option value="snack">Merienda</option>
                 <option value="lunch">Almuerzo</option>
                 <option value="dinner">Cena</option>
@@ -279,7 +271,7 @@
             ]
         };
 
-        // Carb sources with type, added raw legumes
+        // Carb sources
         const carbSources = [
             {name: 'Arroz blanco cocido', carb: 77.5, unit: '100g', unitName: 'g', type: 'salty'},
             {name: 'Arroz integral cocido', carb: 73, unit: '100g', unitName: 'g', type: 'salty'},
@@ -321,7 +313,7 @@
             {name: 'Girasol', fat: 50, unit: '100g', unitName: 'g'}
         ];
 
-        // Fiber sources
+        // Fiber sources - Adjusted to suggest reasonable portions (calculation will cap at 300g per meal)
         const fiberSources = [
             {name: 'Tomate', fiber: 1.2, unit: '100g', unitName: 'g', type: 'salty'},
             {name: 'Lechuga', fiber: 1.3, unit: '100g', unitName: 'g', type: 'salty'},
@@ -357,7 +349,19 @@
         function updateFlavorChoice() {
             const mealType = document.getElementById('meal-type').value;
             const flavorDiv = document.getElementById('flavor-choice');
-            if (mealType === 'breakfast' || mealType === 'snack') {
+            const mealsPerDay = parseInt(document.getElementById('meals-per-day').value);
+            const colacionOption = document.querySelector('#meal-type option[value="colacion"]');
+            if (mealsPerDay === 5) {
+                if (!colacionOption) {
+                    const option = document.createElement('option');
+                    option.value = 'colacion';
+                    option.textContent = 'Colación';
+                    document.getElementById('meal-type').appendChild(option);
+                }
+            } else {
+                if (colacionOption) colacionOption.remove();
+            }
+            if (mealType === 'breakfast' || mealType === 'snack' || mealType === 'colacion') {
                 flavorDiv.style.display = 'block';
             } else {
                 flavorDiv.style.display = 'none';
@@ -372,7 +376,7 @@
 
             // Proteins
             let proteins = proteinSources.common;
-            if (mealType === 'breakfast' || mealType === 'snack') {
+            if (mealType === 'breakfast' || mealType === 'snack' || mealType === 'colacion') {
                 proteins = proteins.concat(proteinSources.breakfastSnack);
             }
             populateSelect('protein-source', proteins);
@@ -425,6 +429,9 @@
             const objective = document.getElementById('objective').value;
             const activityDays = parseFloat(document.getElementById('activity-days').value);
             const activityDuration = parseFloat(document.getElementById('activity-duration').value);
+            const walking = document.getElementById('walking').value;
+            const activityTime = document.getElementById('activity-time').value;
+            const mealsPerDay = parseInt(document.getElementById('meals-per-day').value);
 
             if (isNaN(weight) || isNaN(height) || isNaN(age) || isNaN(activityDays) || isNaN(activityDuration)) {
                 alert('Por favor, ingresa valores válidos.');
@@ -433,8 +440,17 @@
 
             const heightM = height / 100;
             const bmi = weight / (heightM * heightM);
+            let category = '';
+            if (bmi < 18.5) category = 'Bajo peso';
+            else if (bmi < 25) category = 'Normal';
+            else if (bmi < 30) category = 'Sobrepeso';
+            else category = 'Obesidad';
 
-            // Protein adjustment
+            const bmr = calculateBMR(weight, height, age, gender);
+            const activityMultiplier = getActivityMultiplier(activityDays, activityDuration);
+            const tdee = bmr * activityMultiplier;
+
+            // Protein
             let protMultiplier;
             if (objective === 'gain') {
                 if (bmi < 20) {
@@ -472,7 +488,7 @@
             }
             const dailyFat = fatMultiplier * weight;
 
-            // Fiber
+            // Fiber - Keep daily, but in meal calc, cap fiber qty to reasonable 200-300g per meal
             let dailyFiber;
             if (objective === 'loss') {
                 dailyFiber = 35;
@@ -487,75 +503,22 @@
             document.getElementById('fat').textContent = dailyFat.toFixed(0);
             document.getElementById('fiber').textContent = dailyFiber.toFixed(0);
 
-            // BMI display
-            document.getElementById('bmi').textContent = bmi.toFixed(1);
-            let category = '';
-            if (bmi < 18.5) category = 'Bajo peso';
-            else if (bmi < 25) category = 'Normal';
-            else if (bmi < 30) category = 'Sobrepeso';
-            else category = 'Obesidad';
-            document.getElementById('bmi-category').textContent = category;
-
-            // Render 3D avatar
-            renderAvatar(height, bmi);
+            // User summary
+            document.getElementById('user-summary').innerHTML = `
+                Peso: ${weight} kg<br>
+                Altura: ${height} cm<br>
+                Edad: ${age} años<br>
+                Género: ${gender === 'male' ? 'Masculino' : 'Femenino'}<br>
+                Objetivo: ${objective === 'loss' ? 'Pérdida de peso/grasa' : objective === 'maintenance' ? 'Mantenimiento' : 'Aumento de masa muscular'}<br>
+                Actividad: ${activityDays} días/semana, ${activityDuration} min/sesión, hora: ${activityTime}<br>
+                Caminatas: ${walking === 'yes' ? 'Sí' : 'No'}<br>
+                Comidas al día: ${mealsPerDay}<br>
+                IMC: ${bmi.toFixed(1)} (${category})<br>
+                BMR: ${bmr.toFixed(0)} kcal<br>
+                TDEE (estimado): ${tdee.toFixed(0)} kcal
+            `;
 
             document.getElementById('macros').style.display = 'block';
-        }
-
-        function renderAvatar(height, bmi) {
-            const container = document.getElementById('avatar-canvas');
-            container.width = 200;
-            container.height = 300;
-
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, container.width / container.height, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ canvas: container });
-            renderer.setSize(container.width, container.height);
-
-            // Simple body: cylinder for torso, sphere for head, cylinders for arms/legs
-            const scaleHeight = height / 170; // Average height 170cm
-            const scaleWidth = (bmi / 22) * 0.5; // Average BMI 22, scale width
-
-            // Torso
-            const torsoGeometry = new THREE.CylinderGeometry(0.2 * scaleWidth, 0.2 * scaleWidth, 0.8 * scaleHeight, 32);
-            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-            const torso = new THREE.Mesh(torsoGeometry, material);
-            scene.add(torso);
-
-            // Head
-            const headGeometry = new THREE.SphereGeometry(0.15 * scaleWidth, 32, 32);
-            const head = new THREE.Mesh(headGeometry, material);
-            head.position.y = 0.5 * scaleHeight;
-            scene.add(head);
-
-            // Legs
-            const legGeometry = new THREE.CylinderGeometry(0.1 * scaleWidth, 0.1 * scaleWidth, 0.7 * scaleHeight, 32);
-            const leftLeg = new THREE.Mesh(legGeometry, material);
-            leftLeg.position.set(-0.1 * scaleWidth, -0.75 * scaleHeight, 0);
-            scene.add(leftLeg);
-            const rightLeg = leftLeg.clone();
-            rightLeg.position.x = 0.1 * scaleWidth;
-            scene.add(rightLeg);
-
-            // Arms
-            const armGeometry = new THREE.CylinderGeometry(0.05 * scaleWidth, 0.05 * scaleWidth, 0.6 * scaleHeight, 32);
-            const leftArm = new THREE.Mesh(armGeometry, material);
-            leftArm.position.set(-0.25 * scaleWidth, 0.2 * scaleHeight, 0);
-            leftArm.rotation.z = Math.PI / 4;
-            scene.add(leftArm);
-            const rightArm = leftArm.clone();
-            rightArm.position.x = 0.25 * scaleWidth;
-            rightArm.rotation.z = -Math.PI / 4;
-            scene.add(rightArm);
-
-            camera.position.z = 2 * scaleHeight;
-
-            function animate() {
-                requestAnimationFrame(animate);
-                torso.rotation.y += 0.01;
-                renderer.render(scene, camera);
-            }
-            animate();
         }
 
         function calculateMeal() {
@@ -573,19 +536,28 @@
             const mealProtein = dailyProtein / mealsPerDay;
             const mealCarb = dailyCarb / mealsPerDay;
             const mealFat = dailyFat / mealsPerDay;
-            const mealFiber = dailyFiber / mealsPerDay;
+            let mealFiber = dailyFiber / mealsPerDay;
 
             const protQty = (mealProtein / protSource.prot) * (protSource.unit === '100g' ? 100 : 1);
             const carbQty = (mealCarb / carbSource.carb) * (carbSource.unit === '100g' ? 100 : 1);
             const fatQty = (mealFat / fatSource.fat) * (fatSource.unit === '100g' ? 100 : 1);
-            const fiberQty = (mealFiber / fiberSource.fiber) * (fiberSource.unit === '100g' ? 100 : 1);
+            let fiberQty = (mealFiber / fiberSource.fiber) * (fiberSource.unit === '100g' ? 100 : 1);
+
+            // Adjust fiber qty to reasonable portion: cap at 300g, min 100g
+            if (fiberQty > 300) {
+                fiberQty = 300;
+                mealFiber = (fiberQty / 100) * fiberSource.fiber; // adjust provided fiber
+            } else if (fiberQty < 100) {
+                fiberQty = 100;
+                mealFiber = (fiberQty / 100) * fiberSource.fiber;
+            }
 
             document.getElementById('meal-result').innerHTML = `
                 <strong>Para esta comida (1/${mealsPerDay} del día):</strong><br>
                 ${protSource.name}: ${protQty.toFixed(1)} ${protSource.unitName} (pesa crudo)<br>
                 ${carbSource.name}: ${carbQty.toFixed(1)} ${carbSource.unitName}<br>
                 ${fatSource.name}: ${fatQty.toFixed(1)} ${fatSource.unitName}<br>
-                ${fiberSource.name}: ${fiberQty.toFixed(1)} ${fiberSource.unitName}<br>
+                ${fiberSource.name}: ${fiberQty.toFixed(1)} ${fiberSource.unitName} (proporciona ~${mealFiber.toFixed(1)}g fibra; ajustado a porción razonable de 100-300g)<br>
                 <em>(Si eliges fruta como postre, reduce la ensalada para equilibrar el volumen. Cantidades cocidas salvo crudas especificadas.)</em>
             `;
         }
