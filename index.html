@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Nutricional Personalizada</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1, h2, h3 {
+            color: #4CAF50;
+        }
+        section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        form {
+            display: grid;
+            gap: 10px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, select, button {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #macros, #meal-result {
+            font-weight: bold;
+        }
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Guía Nutricional: Qué Comer Según Tus Requerimientos</h1>
+    <p>Ingresa tus datos para calcular tus macros diarios. Luego, elige alimentos para planificar comidas respetando las cantidades.</p>
+
+    <section id="user-input">
+        <h2>Datos Personales</h2>
+        <form>
+            <label>Peso (kg):</label>
+            <input type="number" id="weight" required>
+            
+            <label>Altura (cm):</label>
+            <input type="number" id="height" required>
+            
+            <label>Edad (años):</label>
+            <input type="number" id="age" required>
+            
+            <label>Género:</label>
+            <select id="gender" required>
+                <option value="male">Masculino</option>
+                <option value="female">Femenino</option>
+            </select>
+            
+            <label>Nivel de Actividad:</label>
+            <select id="activity" required>
+                <option value="1.2">Sedentario (poco o ningún ejercicio)</option>
+                <option value="1.375">Ligero (ejercicio 1-3 días/semana)</option>
+                <option value="1.55">Moderado (ejercicio 3-5 días/semana)</option>
+                <option value="1.725">Activo (ejercicio 6-7 días/semana)</option>
+                <option value="1.9">Muy Activo (ejercicio intenso o trabajo físico)</option>
+            </select>
+            
+            <button type="button" onclick="calculateMacros()">Calcular Macros Diarios</button>
+        </form>
+    </section>
+
+    <section id="macros" style="display: none;">
+        <h2>Tus Macros Diarios Aproximados</h2>
+        <p>Proteínas: <span id="protein">0</span> g</p>
+        <p>Carbohidratos: <span id="carb">0</span> g</p>
+        <p>Grasas Saludables: <span id="fat">0</span> g</p>
+        <p>Calorías Totales: <span id="calories">0</span></p>
+        <p><em>Nota: Estos son estimados (30% proteínas, 45% carbs, 25% grasas). Consulta a un nutricionista para ajustes personalizados.</em></p>
+    </section>
+
+    <section id="meal-planner">
+        <h2>Planificador de Comidas</h2>
+        <p>Elige una fuente de proteína y carbohidrato para una comida principal (asumimos 3 comidas al día, así que ~1/3 de los macros diarios por comida). Agrega grasas y fibras según necesites.</p>
+        
+        <label>Fuente de Proteína:</label>
+        <select id="protein-source">
+            <option value="31">Pechuga de pollo (31g prot/100g)</option>
+            <option value="26">Carne magra (26g prot/100g)</option>
+            <option value="20">Salmón (20g prot/100g)</option>
+            <option value="9">Lentejas cocidas (9g prot/100g)</option>
+            <option value="13">Huevos (13g prot/100g)</option>
+            <option value="8">Tofu (8g prot/100g)</option>
+            <option value="10">Yogur griego (10g prot/100g)</option>
+        </select>
+        
+        <label>Fuente de Carbohidrato:</label>
+        <select id="carb-source">
+            <option value="28">Arroz blanco cocido (28g carb/100g)</option>
+            <option value="31">Pasta cocida (31g carb/100g)</option>
+            <option value="17">Patatas hervidas (17g carb/100g)</option>
+            <option value="43">Pan integral (43g carb/100g)</option>
+            <option value="21">Quinua cocida (21g carb/100g)</option>
+        </select>
+        
+        <label>Fuente de Grasa Saludable:</label>
+        <select id="fat-source">
+            <option value="15">Aguacate (15g grasa/100g)</option>
+            <option value="50">Almendras (50g grasa/100g)</option>
+            <option value="100">Aceite de oliva (100g grasa/100g)</option>
+            <option value="31">Semillas de chía (31g grasa/100g)</option>
+        </select>
+        
+        <button type="button" onclick="calculateMeal()">Calcular Cantidades para esta Comida</button>
+        
+        <div id="meal-result"></div>
+        <p><em>Agrega vegetales (ej. 200g por comida) para fibras: espinacas, brócoli, zanahorias (bajos en calorías, altos en fibra).</em></p>
+    </section>
+
+    <section id="breakfast-snacks">
+        <h2>Opciones para Desayunos y Meriendas</h2>
+        <p>Estas son sugerencias aproximadas para ~20% de tus macros diarios. Ajusta según tus cálculos.</p>
+        
+        <h3>Opciones Saladas</h3>
+        <ul>
+            <li>Huevos revueltos con vegetales: 2 huevos (~26g prot) + 200g espinacas (fibra) + 1 rebanada pan integral (~20g carb).</li>
+            <li>Tostada con aguacate: 1 rebanada pan integral (~20g carb) + 50g aguacate (~7g grasa) + tomate.</li>
+            <li>Yogur griego con pepino: 150g yogur (~15g prot) + pepino (fibra).</li>
+        </ul>
+        
+        <h3>Opciones Dulces</h3>
+        <ul>
+            <li>Yogur griego con frutas: 150g yogur (~15g prot) + 100g fresas (~8g carb, fibra) + semillas de chía (~5g grasa).</li>
+            <li>Avena con almendras: 30g avena (~15g carb) + 20g almendras (~10g grasa) + fruta.</li>
+            <li>Batido: 100g yogur (~10g prot) + banana (~20g carb) + chía.</li>
+        </ul>
+    </section>
+
+    <script>
+        function calculateBMR(weight, height, age, gender) {
+            if (gender === 'male') {
+                return 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+            } else {
+                return 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+            }
+        }
+
+        function calculateMacros() {
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const age = parseFloat(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+            const activity = parseFloat(document.getElementById('activity').value);
+
+            if (isNaN(weight) || isNaN(height) || isNaN(age)) {
+                alert('Por favor, ingresa valores válidos.');
+                return;
+            }
+
+            const bmr = calculateBMR(weight, height, age, gender);
+            const tdee = bmr * activity;
+
+            const proteinCals = tdee * 0.3;
+            const carbCals = tdee * 0.45;
+            const fatCals = tdee * 0.25;
+
+            const protein = proteinCals / 4;
+            const carb = carbCals / 4;
+            const fat = fatCals / 9;
+
+            document.getElementById('protein').textContent = protein.toFixed(0);
+            document.getElementById('carb').textContent = carb.toFixed(0);
+            document.getElementById('fat').textContent = fat.toFixed(0);
+            document.getElementById('calories').textContent = tdee.toFixed(0);
+
+            document.getElementById('macros').style.display = 'block';
+        }
+
+        function calculateMeal() {
+            const dailyProtein = parseFloat(document.getElementById('protein').textContent);
+            const dailyCarb = parseFloat(document.getElementById('carb').textContent);
+            const dailyFat = parseFloat(document.getElementById('fat').textContent);
+
+            const proteinPer100 = parseFloat(document.getElementById('protein-source').value);
+            const carbPer100 = parseFloat(document.getElementById('carb-source').value);
+            const fatPer100 = parseFloat(document.getElementById('fat-source').value);
+
+            const mealProtein = dailyProtein / 3;
+            const mealCarb = dailyCarb / 3;
+            const mealFat = dailyFat / 3;
+
+            const proteinQty = (mealProtein / proteinPer100) * 100;
+            const carbQty = (mealCarb / carbPer100) * 100;
+            const fatQty = (mealFat / fatPer100) * 100;
+
+            const proteinName = document.getElementById('protein-source').options[document.getElementById('protein-source').selectedIndex].text;
+            const carbName = document.getElementById('carb-source').options[document.getElementById('carb-source').selectedIndex].text;
+            const fatName = document.getElementById('fat-source').options[document.getElementById('fat-source').selectedIndex].text;
+
+            document.getElementById('meal-result').innerHTML = `
+                Para esta comida (1/3 del día):<br>
+                ${proteinName}: ${proteinQty.toFixed(0)}g<br>
+                ${carbName}: ${carbQty.toFixed(0)}g<br>
+                ${fatName}: ${fatQty.toFixed(0)}g<br>
+                (Agrega vegetales para fibra y volumen sin muchas calorías.)
+            `;
+        }
+    </script>
+</body>
+</html>
