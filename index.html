@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NutriFit Guide: Tu Asistente Personal para Comidas Saludables</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -13,13 +14,18 @@
             background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
             color: #333;
             line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         header {
             text-align: center;
             padding: 40px 20px;
-            background: #4caf50;
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
             color: white;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
         }
         h1 {
             font-size: 2.8em;
@@ -35,6 +41,7 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            flex: 1;
         }
         h2, h3 {
             color: #388e3c;
@@ -46,10 +53,11 @@
             margin-bottom: 30px;
             border-radius: 15px;
             box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         section:hover {
             transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
         }
         form {
             display: grid;
@@ -83,10 +91,11 @@
             cursor: pointer;
             font-weight: 600;
             border: none;
-            transition: background 0.3s;
+            transition: background 0.3s, transform 0.2s;
         }
         button:hover {
             background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%);
+            transform: scale(1.02);
         }
         #macros {
             background: #f9fff9;
@@ -110,11 +119,24 @@
         #flavor-choice {
             display: none;
         }
+        #bmi-info {
+            margin-top: 20px;
+        }
+        #avatar-container {
+            width: 200px;
+            height: 300px;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+        }
         footer {
             text-align: center;
             padding: 20px;
             color: #777;
             font-size: 0.9em;
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
         }
     </style>
 </head>
@@ -188,12 +210,18 @@
             <p>Carbohidratos: <span id="carb">0</span> g</p>
             <p>Grasas Saludables: <span id="fat">0</span> g</p>
             <p>Fibra: <span id="fiber">0</span> g</p>
+            <div id="bmi-info">
+                <p>IMC: <span id="bmi">0</span> (Categoría: <span id="bmi-category"></span>)</p>
+                <div id="avatar-container">
+                    <canvas id="avatar-canvas"></canvas>
+                </div>
+            </div>
             <p><em>Nota: Estos cálculos consideran tu peso, objetivo y actividad. Usa el planificador para distribuir en comidas.</em></p>
         </section>
 
         <section id="meal-planner">
             <h2>Planificador de Comidas 🥘</h2>
-            <p>Selecciona el tipo de comida y personaliza tus opciones. Para almuerzo o cena, incluye frutas como postre si prefieres menos ensalada. Calculamos cantidades para equilibrar tus macros diarios.</p>
+            <p>Selecciona el tipo de comida y personaliza tus opciones. Para almuerzo o cena, incluye frutas como postre si prefieres menos ensalada. Calculamos cantidades para equilibrar tus macros diarios. Nota: Las cantidades se refieren a alimentos cocidos, a menos que se especifique "crudos". Para carnes y proteínas, pesa crudo; para carbs como arroz o legumbres, considera el estado indicado (cocido o crudo).</p>
 
             <label>Tipo de Comida:</label>
             <select id="meal-type" onchange="updateFlavorChoice()">
@@ -251,18 +279,18 @@
             ]
         };
 
-        // Carb sources with type
+        // Carb sources with type, added raw legumes
         const carbSources = [
-            {name: 'Arroz blanco', carb: 77.5, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Arroz integral', carb: 73, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Arroz blanco cocido', carb: 77.5, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Arroz integral cocido', carb: 73, unit: '100g', unitName: 'g', type: 'salty'},
             {name: 'Fideos secos', carb: 73.5, unit: '100g', unitName: 'g', type: 'salty'},
             {name: 'Avena arrollada', carb: 63, unit: '100g', unitName: 'g', type: 'both'},
             {name: 'Harina de trigo', carb: 75.5, unit: '100g', unitName: 'g', type: 'salty'},
             {name: 'Polenta', carb: 79, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Papa', carb: 18.5, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Batata', carb: 20.5, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Mandioca', carb: 39, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Zapallo', carb: 7, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Papa cocida', carb: 18.5, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Batata cocida', carb: 20.5, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Mandioca cocida', carb: 39, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Zapallo cocido', carb: 7, unit: '100g', unitName: 'g', type: 'salty'},
             {name: 'Pan blanco', carb: 49, unit: '100g', unitName: 'g', type: 'both'},
             {name: 'Pan integral', carb: 43.5, unit: '100g', unitName: 'g', type: 'both'},
             {name: 'Pan de molde', carb: 46.5, unit: '100g', unitName: 'g', type: 'both'},
@@ -272,7 +300,10 @@
             {name: 'Manzana', carb: 13.5, unit: '100g', unitName: 'g', type: 'sweet'},
             {name: 'Lentejas cocidas', carb: 20, unit: '100g', unitName: 'g', type: 'salty'},
             {name: 'Garbanzos cocidos', carb: 20, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Porotos cocidos', carb: 20, unit: '100g', unitName: 'g', type: 'salty'}
+            {name: 'Porotos cocidos', carb: 20, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Lentejas crudas', carb: 57.5, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Garbanzos crudos', carb: 60.5, unit: '100g', unitName: 'g', type: 'salty'},
+            {name: 'Porotos crudos', carb: 61, unit: '100g', unitName: 'g', type: 'salty'}
         ];
 
         // Fat sources
@@ -290,7 +321,7 @@
             {name: 'Girasol', fat: 50, unit: '100g', unitName: 'g'}
         ];
 
-        // Fiber sources with type (salty for veggies, sweet for fruits). For lunch/dinner, include fruits as postre options.
+        // Fiber sources
         const fiberSources = [
             {name: 'Tomate', fiber: 1.2, unit: '100g', unitName: 'g', type: 'salty'},
             {name: 'Lechuga', fiber: 1.3, unit: '100g', unitName: 'g', type: 'salty'},
@@ -300,7 +331,7 @@
             {name: 'Pepino', fiber: 0.5, unit: '100g', unitName: 'g', type: 'salty'},
             {name: 'Pimiento', fiber: 1.7, unit: '100g', unitName: 'g', type: 'salty'},
             {name: 'Zapallo', fiber: 1.0, unit: '100g', unitName: 'g', type: 'salty'},
-            {name: 'Ensalada mixta (lechuga + tomate + pepino)', fiber: 1.0, unit: '100g', unitName: 'g', type: 'salty'}, // Aprox average
+            {name: 'Ensalada mixta (lechuga + tomate + pepino)', fiber: 1.0, unit: '100g', unitName: 'g', type: 'salty'},
             {name: 'Banana (postre)', fiber: 2.6, unit: '100g', unitName: 'g', type: 'sweet'},
             {name: 'Manzana (postre)', fiber: 2.4, unit: '100g', unitName: 'g', type: 'sweet'},
             {name: 'Naranja (postre)', fiber: 2.4, unit: '100g', unitName: 'g', type: 'sweet'},
@@ -337,7 +368,7 @@
         // Update options based on meal type and flavor
         function updateOptions() {
             const mealType = document.getElementById('meal-type').value;
-            const flavor = document.getElementById('flavor').value || 'salty'; // default salty for lunch/dinner
+            const flavor = document.getElementById('flavor').value || 'salty';
 
             // Proteins
             let proteins = proteinSources.common;
@@ -357,10 +388,10 @@
             }
             populateSelect('carb-source', carbFilter);
 
-            // Fiber: For lunch/dinner, include all (fruits as postre)
+            // Fiber
             let fiberFilter = fiberSources;
             if (mealType === 'lunch' || mealType === 'dinner') {
-                fiberFilter = fiberSources; // Include sweet as postre
+                fiberFilter = fiberSources;
             } else if (flavor === 'sweet') {
                 fiberFilter = fiberSources.filter(f => f.type === 'sweet');
             } else {
@@ -400,10 +431,19 @@
                 return;
             }
 
-            // Protein
+            const heightM = height / 100;
+            const bmi = weight / (heightM * heightM);
+
+            // Protein adjustment
             let protMultiplier;
             if (objective === 'gain') {
-                protMultiplier = 1.7;
+                if (bmi < 20) {
+                    protMultiplier = 2.0;
+                } else if (bmi < 25) {
+                    protMultiplier = 1.8;
+                } else {
+                    protMultiplier = 1.6;
+                }
             } else {
                 protMultiplier = (objective === 'loss' && weight > 100) ? 1.2 : 1.3;
             }
@@ -447,7 +487,75 @@
             document.getElementById('fat').textContent = dailyFat.toFixed(0);
             document.getElementById('fiber').textContent = dailyFiber.toFixed(0);
 
+            // BMI display
+            document.getElementById('bmi').textContent = bmi.toFixed(1);
+            let category = '';
+            if (bmi < 18.5) category = 'Bajo peso';
+            else if (bmi < 25) category = 'Normal';
+            else if (bmi < 30) category = 'Sobrepeso';
+            else category = 'Obesidad';
+            document.getElementById('bmi-category').textContent = category;
+
+            // Render 3D avatar
+            renderAvatar(height, bmi);
+
             document.getElementById('macros').style.display = 'block';
+        }
+
+        function renderAvatar(height, bmi) {
+            const container = document.getElementById('avatar-canvas');
+            container.width = 200;
+            container.height = 300;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, container.width / container.height, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: container });
+            renderer.setSize(container.width, container.height);
+
+            // Simple body: cylinder for torso, sphere for head, cylinders for arms/legs
+            const scaleHeight = height / 170; // Average height 170cm
+            const scaleWidth = (bmi / 22) * 0.5; // Average BMI 22, scale width
+
+            // Torso
+            const torsoGeometry = new THREE.CylinderGeometry(0.2 * scaleWidth, 0.2 * scaleWidth, 0.8 * scaleHeight, 32);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const torso = new THREE.Mesh(torsoGeometry, material);
+            scene.add(torso);
+
+            // Head
+            const headGeometry = new THREE.SphereGeometry(0.15 * scaleWidth, 32, 32);
+            const head = new THREE.Mesh(headGeometry, material);
+            head.position.y = 0.5 * scaleHeight;
+            scene.add(head);
+
+            // Legs
+            const legGeometry = new THREE.CylinderGeometry(0.1 * scaleWidth, 0.1 * scaleWidth, 0.7 * scaleHeight, 32);
+            const leftLeg = new THREE.Mesh(legGeometry, material);
+            leftLeg.position.set(-0.1 * scaleWidth, -0.75 * scaleHeight, 0);
+            scene.add(leftLeg);
+            const rightLeg = leftLeg.clone();
+            rightLeg.position.x = 0.1 * scaleWidth;
+            scene.add(rightLeg);
+
+            // Arms
+            const armGeometry = new THREE.CylinderGeometry(0.05 * scaleWidth, 0.05 * scaleWidth, 0.6 * scaleHeight, 32);
+            const leftArm = new THREE.Mesh(armGeometry, material);
+            leftArm.position.set(-0.25 * scaleWidth, 0.2 * scaleHeight, 0);
+            leftArm.rotation.z = Math.PI / 4;
+            scene.add(leftArm);
+            const rightArm = leftArm.clone();
+            rightArm.position.x = 0.25 * scaleWidth;
+            rightArm.rotation.z = -Math.PI / 4;
+            scene.add(rightArm);
+
+            camera.position.z = 2 * scaleHeight;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                torso.rotation.y += 0.01;
+                renderer.render(scene, camera);
+            }
+            animate();
         }
 
         function calculateMeal() {
@@ -474,11 +582,11 @@
 
             document.getElementById('meal-result').innerHTML = `
                 <strong>Para esta comida (1/${mealsPerDay} del día):</strong><br>
-                ${protSource.name}: ${protQty.toFixed(1)} ${protSource.unitName}<br>
+                ${protSource.name}: ${protQty.toFixed(1)} ${protSource.unitName} (pesa crudo)<br>
                 ${carbSource.name}: ${carbQty.toFixed(1)} ${carbSource.unitName}<br>
                 ${fatSource.name}: ${fatQty.toFixed(1)} ${fatSource.unitName}<br>
                 ${fiberSource.name}: ${fiberQty.toFixed(1)} ${fiberSource.unitName}<br>
-                <em>(Si eliges fruta como postre, reduce la ensalada para equilibrar el volumen.)</em>
+                <em>(Si eliges fruta como postre, reduce la ensalada para equilibrar el volumen. Cantidades cocidas salvo crudas especificadas.)</em>
             `;
         }
     </script>
