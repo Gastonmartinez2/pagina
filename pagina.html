@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guía de Alimentación Personalizada</title>
+    <title>Tu Guía Práctica para una Alimentación Saludable</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
@@ -163,6 +163,14 @@
             color: #4CAF50;
         }
 
+        .header-image {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -178,7 +186,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>¡Tu Guía de Alimentación Personalizada!</h1>
+        <img src="https://nutritionsource.hsph.harvard.edu/wp-content/uploads/2016/04/HealthyEatingPlate_NSHome.jpg" alt="Guía de Alimentación Saludable" class="header-image">
+        <h1>Tu Guía Práctica para una Alimentación Saludable</h1>
         <form id="user-form">
             <label for="age">Edad (años):</label>
             <input type="number" id="age" min="10" max="60" required>
@@ -393,6 +402,15 @@
         // Frutas variadas para ejemplos
         const fruits = ['pera', 'banana', 'naranja', 'kiwi', 'manzana'];
 
+        // Función para redondear gramos
+        function roundGrams(value) {
+            if (value < 50) {
+                return Math.round(value / 10) * 10;
+            } else {
+                return Math.round(value / 50) * 50;
+            }
+        }
+
         // Fórmulas de cálculo
         function calculateBMI(weight, height) {
             height = height / 100;
@@ -548,17 +566,21 @@
 
             let protLi = document.createElement('li');
             let protAmountText = '';
+            let amountProt = (mealProteins * 100) / option.protPer100;
+            if (option.protein === 'muslo de pollo') {
+                amountProt *= 1.1; // Ajuste por hueso
+            }
+            amountProt = roundGrams(amountProt);
             if (option.fixedProt) {
                 protAmountText = `1 porción de ${option.protein}`;
             } else {
-                const amountProt = Math.round((mealProteins * 100) / option.protPer100);
                 protAmountText = `${amountProt}g de ${option.protein} (peso crudo)`;
             }
             protLi.innerHTML = `<strong>Proteína:</strong> ${protAmountText}`;
             ul.appendChild(protLi);
 
             let carbLi = document.createElement('li');
-            const amountCarb = Math.round((mealCarbs * 100) / option.carbPer100);
+            let amountCarb = roundGrams((mealCarbs * 100) / option.carbPer100);
             carbLi.innerHTML = `<strong>Carbohidrato:</strong> ${amountCarb}g de ${option.carb} (peso crudo)`;
             ul.appendChild(carbLi);
 
