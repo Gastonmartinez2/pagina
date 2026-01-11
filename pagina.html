@@ -232,7 +232,7 @@ const foodMacros = {
 };
 
 // ──────────────────────────────────────────────
-//             OPCIONES – NOMBRE DE PLATO CLARO + PORCIONES REALISTAS
+//             OPCIONES – NOMBRE CLARO + PORCIONES CONCRETAS
 // ──────────────────────────────────────────────
 const mealTemplates = {
   desayuno: [
@@ -250,32 +250,32 @@ const mealTemplates = {
 
   almuerzo: {
     "Carne magra vacuna": [
-      {p:"carne magra vacuna", c:"arroz blanco", f:"aceite oliva", desc:"Carne magra con arroz integral y ensalada chica (100g tomate + 50g lechuga) 🍖🍚🥗"},
-      {p:"carne magra vacuna", c:"papa hervida", f:"aceite oliva", desc:"Carne magra con papas al horno y brócoli (150g) 🍖🥔🥦"},
-      {p:"carne magra vacuna", c:"fideos integrales", f:"aceite oliva", desc:"Carne magra con fideos y tomate (100g) 🍖🍝🍅"},
-      {p:"carne magra vacuna", c:"lentejas cocidas", f:"aceite oliva", desc:"Carne magra con lentejas y espinacas (100g) 🍖🥣🌱"}
+      {p:"carne magra vacuna", c:"arroz blanco", f:"aceite oliva", desc:"Carne magra con arroz integral", fibra:"ensalada chica (100g tomate + 50g lechuga)"},
+      {p:"carne magra vacuna", c:"papa hervida", f:"aceite oliva", desc:"Carne magra con papas al horno", fibra:"brócoli cocido (150g)"},
+      {p:"carne magra vacuna", c:"fideos integrales", f:"aceite oliva", desc:"Carne magra con fideos integrales", fibra:"tomate fresco (150g)"},
+      {p:"carne magra vacuna", c:"lentejas cocidas", f:"aceite oliva", desc:"Carne magra con lentejas", fibra:"espinacas salteadas (120g)"}
     ],
     "Pechuga de pollo": [
-      {p:"pechuga de pollo", c:"arroz blanco", f:"aceite oliva", desc:"Pechuga de pollo con arroz y ensalada chica (100g tomate) 🍗🍚🥗"},
-      {p:"pechuga de pollo", c:"papa hervida", f:"aceite oliva", desc:"Pechuga de pollo con papas y lechuga (100g) 🍗🥔🥬"},
-      {p:"pechuga de pollo", c:"fideos integrales", f:"aceite oliva", desc:"Pechuga de pollo con fideos y brócoli (150g) 🍗🍝🥦"},
-      {p:"pechuga de pollo", c:"lentejas cocidas", f:"aceite oliva", desc:"Pechuga de pollo con lentejas y espinacas (100g) 🍗🥣🌱"}
+      {p:"pechuga de pollo", c:"arroz blanco", f:"aceite oliva", desc:"Pechuga de pollo con arroz", fibra:"ensalada chica (100g tomate + 50g lechuga)"},
+      {p:"pechuga de pollo", c:"papa hervida", f:"aceite oliva", desc:"Pechuga de pollo con papas", fibra:"lechuga y zanahoria (150g total)"},
+      {p:"pechuga de pollo", c:"fideos integrales", f:"aceite oliva", desc:"Pechuga de pollo con fideos integrales", fibra:"brócoli al vapor (150g)"},
+      {p:"pechuga de pollo", c:"lentejas cocidas", f:"aceite oliva", desc:"Pechuga de pollo con lentejas", fibra:"espinacas frescas (120g)"}
     ],
     "Muslo de pollo (sin piel)": [
-      {p:"muslo pollo sin piel", c:"arroz blanco", f:"aceite oliva", desc:"Muslo sin piel con arroz y ensalada mixta chica (lechuga 50g + tomate 50g) 🍗🍚🥗"},
-      {p:"muslo pollo sin piel", c:"papa hervida", f:"aceite oliva", desc:"Muslo sin piel con papas y zanahorias (150g) 🍗🥔🥕"},
-      {p:"muslo pollo sin piel", c:"fideos integrales", f:"aceite oliva", desc:"Muslo sin piel con fideos y espárragos (150g) 🍗🍝🌿"},
-      {p:"muslo pollo sin piel", c:"lentejas cocidas", f:"aceite oliva", desc:"Muslo sin piel con lentejas y tomate (100g) 🍗🥣🍅"}
+      {p:"muslo pollo sin piel", c:"arroz blanco", f:"aceite oliva", desc:"Muslo sin piel con arroz", fibra:"ensalada mixta chica (lechuga 50g + tomate 50g)"},
+      {p:"muslo pollo sin piel", c:"papa hervida", f:"aceite oliva", desc:"Muslo sin piel con papas", fibra:"zanahorias cocidas (150g)"},
+      {p:"muslo pollo sin piel", c:"fideos integrales", f:"aceite oliva", desc:"Muslo sin piel con fideos integrales", fibra:"espárragos (150g)"},
+      {p:"muslo pollo sin piel", c:"lentejas cocidas", f:"aceite oliva", desc:"Muslo sin piel con lentejas", fibra:"tomate y cebolla (150g total)"}
     ],
     "Pescado blanco": [
-      {p:"pescado blanco", c:"arroz blanco", f:"aceite oliva", desc:"Pescado blanco con arroz y ensalada mixta chica (lechuga 50g + tomate 50g) 🐟🍚🥗"},
-      {p:"pescado blanco", c:"papa hervida", f:"aceite oliva", desc:"Pescado blanco con papas y zanahorias (150g) 🐟🥔🥕"},
-      {p:"pescado blanco", c:"fideos integrales", f:"aceite oliva", desc:"Pescado blanco con fideos y espárragos (150g) 🐟🍝🌿"},
-      {p:"pescado blanco", c:"lentejas cocidas", f:"aceite oliva", desc:"Pescado blanco con lentejas y espinacas (100g) 🐟🥣🌱"}
+      {p:"pescado blanco", c:"arroz blanco", f:"aceite oliva", desc:"Pescado blanco con arroz", fibra:"ensalada chica (lechuga 50g + tomate 50g)"},
+      {p:"pescado blanco", c:"papa hervida", f:"aceite oliva", desc:"Pescado blanco con papas", fibra:"zanahorias al vapor (150g)"},
+      {p:"pescado blanco", c:"fideos integrales", f:"aceite oliva", desc:"Pescado blanco con fideos integrales", fibra:"espárragos (150g)"},
+      {p:"pescado blanco", c:"lentejas cocidas", f:"aceite oliva", desc:"Pescado blanco con lentejas", fibra:"espinacas frescas (120g)"}
     ],
     "Carne de cerdo magra": [
-      {p:"carne magra vacuna", c:"arroz blanco", f:"aceite oliva", desc:"Cerdo magro con arroz y brócoli (150g) 🐷🍚🥦"},
-      {p:"carne magra vacuna", c:"papa hervida", f:"aceite oliva", desc:"Cerdo magro con papas y espinacas (100g) 🐷🥔🌱"}
+      {p:"carne magra vacuna", c:"arroz blanco", f:"aceite oliva", desc:"Cerdo magro con arroz", fibra:"brócoli al vapor (150g)"},
+      {p:"carne magra vacuna", c:"papa hervida", f:"aceite oliva", desc:"Cerdo magro con papas", fibra:"espinacas salteadas (120g)"}
     ]
   },
 
@@ -288,27 +288,27 @@ const mealTemplates = {
 
   cena: {
     "Carne magra vacuna": [
-      {p:"carne magra vacuna", c:"papa hervida", f:"aceite oliva", desc:"Carne magra con papas y ensalada chica (lechuga 50g + tomate 50g) 🍖🥔🥗"},
-      {p:"carne magra vacuna", c:"arroz blanco", f:"aceite oliva", desc:"Carne magra con arroz y lechuga (100g) 🍖🍚🥬"},
-      {p:"carne magra vacuna", c:"fideos integrales", f:"aceite oliva", desc:"Carne magra con fideos y tomate (100g) 🍖🍝🍅"},
-      {p:"carne magra vacuna", c:"lentejas cocidas", f:"aceite oliva", desc:"Carne magra con lentejas y brócoli (150g) 🍖🥣🥦"}
+      {p:"carne magra vacuna", c:"papa hervida", f:"aceite oliva", desc:"Carne magra con papas", fibra:"ensalada chica (lechuga 50g + tomate 50g)"},
+      {p:"carne magra vacuna", c:"arroz blanco", f:"aceite oliva", desc:"Carne magra con arroz", fibra:"lechuga fresca (100g)"},
+      {p:"carne magra vacuna", c:"fideos integrales", f:"aceite oliva", desc:"Carne magra con fideos integrales", fibra:"tomate fresco (150g)"},
+      {p:"carne magra vacuna", c:"lentejas cocidas", f:"aceite oliva", desc:"Carne magra con lentejas", fibra:"brócoli cocido (150g)"}
     ],
     "Pechuga de pollo": [
-      {p:"pechuga de pollo", c:"papa hervida", f:"aceite oliva", desc:"Pechuga con papas y ensalada chica (lechuga 50g + tomate 50g) 🍗🥔🥗"},
-      {p:"pechuga de pollo", c:"arroz blanco", f:"aceite oliva", desc:"Pechuga con arroz y tomate (100g) 🍗🍚🍅"},
-      {p:"pechuga de pollo", c:"fideos integrales", f:"aceite oliva", desc:"Pechuga con fideos y brócoli (150g) 🍗🍝🥦"},
-      {p:"pechuga de pollo", c:"lentejas cocidas", f:"aceite oliva", desc:"Pechuga con lentejas y espinacas (100g) 🍗🥣🌱"}
+      {p:"pechuga de pollo", c:"papa hervida", f:"aceite oliva", desc:"Pechuga con papas", fibra:"ensalada chica (lechuga 50g + tomate 50g)"},
+      {p:"pechuga de pollo", c:"arroz blanco", f:"aceite oliva", desc:"Pechuga con arroz", fibra:"tomate fresco (100g)"},
+      {p:"pechuga de pollo", c:"fideos integrales", f:"aceite oliva", desc:"Pechuga con fideos integrales", fibra:"brócoli al vapor (150g)"},
+      {p:"pechuga de pollo", c:"lentejas cocidas", f:"aceite oliva", desc:"Pechuga con lentejas", fibra:"espinacas frescas (120g)"}
     ],
     "Muslo de pollo (sin piel)": [
-      {p:"muslo pollo sin piel", c:"papa hervida", f:"aceite oliva", desc:"Muslo sin piel con papas y ensalada chica (lechuga 50g + tomate 50g) 🍗🥔🥗"},
-      {p:"muslo pollo sin piel", c:"arroz blanco", f:"aceite oliva", desc:"Muslo sin piel con arroz y espinacas (100g) 🍗🍚🌱"},
-      {p:"muslo pollo sin piel", c:"fideos integrales", f:"aceite oliva", desc:"Muslo sin piel con fideos y zanahorias (100g) 🍗🍝🥕"},
-      {p:"muslo pollo sin piel", c:"lentejas cocidas", f:"aceite oliva", desc:"Muslo sin piel con lentejas y ensalada mixta chica 🍗🥣🥗"}
+      {p:"muslo pollo sin piel", c:"papa hervida", f:"aceite oliva", desc:"Muslo sin piel con papas", fibra:"ensalada chica (lechuga 50g + tomate 50g)"},
+      {p:"muslo pollo sin piel", c:"arroz blanco", f:"aceite oliva", desc:"Muslo sin piel con arroz", fibra:"espinacas frescas (100g)"},
+      {p:"muslo pollo sin piel", c:"fideos integrales", f:"aceite oliva", desc:"Muslo sin piel con fideos integrales", fibra:"zanahorias cocidas (100g)"},
+      {p:"muslo pollo sin piel", c:"lentejas cocidas", f:"aceite oliva", desc:"Muslo sin piel con lentejas", fibra:"ensalada mixta chica (lechuga 50g + tomate 50g)"}
     ],
     "Pescado blanco": [
-      {p:"pescado blanco", c:"papa hervida", f:"aceite oliva", desc:"Pescado con papas y ensalada chica (tomate 100g) 🐟🥔🍅"},
-      {p:"pescado blanco", c:"arroz blanco", f:"aceite oliva", desc:"Pescado con arroz y espárragos (150g) 🐟🍚🌿"},
-      {p:"pescado blanco", c:"fideos integrales", f:"aceite oliva", desc:"Pescado con fideos y vegetales mixtos (brócoli 100g + zanahoria 50g) 🐟🍝🥗"}
+      {p:"pescado blanco", c:"papa hervida", f:"aceite oliva", desc:"Pescado con papas", fibra:"ensalada de tomate (150g)"},
+      {p:"pescado blanco", c:"arroz blanco", f:"aceite oliva", desc:"Pescado con arroz", fibra:"espárragos al vapor (150g)"},
+      {p:"pescado blanco", c:"fideos integrales", f:"aceite oliva", desc:"Pescado con fideos integrales", fibra:"brócoli y zanahoria (150g total)"}
     ]
   }
 };
@@ -388,7 +388,7 @@ form.addEventListener('submit',e=>{
   document.getElementById('proteins').textContent=`Proteínas: ${macros.proteins}g 💪`;
   document.getElementById('carbs').innerHTML = `Carbohidratos: ${macros.carbs}g 🍚 ${objGlobal==='muscle' ? '(más carbohidratos para volumen)' : ''}`;
   document.getElementById('fats').textContent=`Grasas: ${macros.fats}g 🥑`;
-  document.getElementById('fiber').textContent=`Fibra recomendada: ${macros.fiber}g 🥗`;
+  document.getElementById('fiber').textContent=`Fibra recomendada: ${macros.fiber}g 🥗 ${objGlobal==='loss'||objGlobal==='tone' ? '(prioridad alta para bajar grasa)' : ''}`;
 
   results.style.display='block';
   mealSel.value='';
@@ -432,6 +432,14 @@ mealSel.addEventListener('change',e=>{
         ul.innerHTML += `<li><strong>Carbohidrato:</strong> ${cQty}g de ${opt.c} (peso crudo) 🍚</li>`;
       }
 
+      let fibTxt = '';
+      if (objGlobal === 'loss' || objGlobal === 'tone') {
+        fibTxt = opt.fibra || 'verduras abundantes (ej: 150–200g brócoli o ensalada mixta) 🥗';
+      } else {
+        fibTxt = opt.fibra || 'ensalada chica (ej: 100g tomate + 50g lechuga) 🥗';
+      }
+      ul.innerHTML += `<li><strong>Fibra (verduras):</strong> ${fibTxt}</li>`;
+
       let fatTxt = '';
       if(opt.f === 'aceite oliva' && isMain) {
         fatTxt = '1 cucharada de aceite de oliva (~10g) 🫒';
@@ -440,11 +448,6 @@ mealSel.addEventListener('change',e=>{
         fatTxt = `${fQty}g aprox de ${opt.f} 🥑🌰`;
       }
       if(fatTxt) ul.innerHTML += `<li><strong>Grasas saludables:</strong> ${fatTxt}</li>`;
-
-      let fibTxt = objGlobal==='muscle' ? 'ensalada chica (ej: 100g tomate + 50g lechuga) 🥗'
-                  : (objGlobal==='loss'||objGlobal==='tone') ? 'verduras abundantes + fruta postre 🥗🍎'
-                  : 'verduras moderadas (ej: 100g tomate o brócoli) 🥗';
-      ul.innerHTML += `<li><strong>Fibra:</strong> ${fibTxt}</li>`;
 
       card.appendChild(ul);
       optDiv.appendChild(card);
@@ -478,12 +481,15 @@ mealSel.addEventListener('change',e=>{
         const cQty = roundPractical(carbPer * 100 / (foodMacros[opt.c]?.hc || 70));
         ul.innerHTML += `<li><strong>Carbohidrato:</strong> ${cQty}g de ${opt.c} (peso crudo) 🍚</li>`;
 
-        ul.innerHTML += `<li><strong>Grasas saludables:</strong> 1 cucharada de aceite de oliva (~10g) 🫒</li>`;
+        let fibTxt = '';
+        if (objGlobal === 'loss' || objGlobal === 'tone') {
+          fibTxt = opt.fibra || 'verduras abundantes (ej: 150–200g brócoli o ensalada mixta) 🥗';
+        } else {
+          fibTxt = opt.fibra || 'ensalada chica (ej: 100g tomate + 50g lechuga) 🥗';
+        }
+        ul.innerHTML += `<li><strong>Fibra (verduras):</strong> ${fibTxt}</li>`;
 
-        let fibTxt = objGlobal==='muscle' ? 'ensalada chica (ej: 100g tomate + 50g lechuga) 🥗'
-                    : (objGlobal==='loss'||objGlobal==='tone') ? 'verduras abundantes + fruta postre 🥗🍎'
-                    : 'verduras moderadas (ej: 100g tomate o brócoli) 🥗';
-        ul.innerHTML += `<li><strong>Fibra:</strong> ${fibTxt}</li>`;
+        ul.innerHTML += `<li><strong>Grasas saludables:</strong> 1 cucharada de aceite de oliva (~10g) 🫒</li>`;
 
         card.appendChild(ul);
         groupDiv.appendChild(card);
