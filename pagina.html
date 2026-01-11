@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Descubre Tu Plan Nutricional Perfecto! - Guía Personalizada para Comer Saludable</title>
+    <title>Guía de Alimentación Personalizada</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
@@ -98,6 +98,25 @@
         #meal-options {
             margin-top: 20px;
             display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .group-section {
+            background: #f0f8ff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .group-section h2 {
+            color: #4CAF50;
+            font-size: 1.6em;
+            margin-bottom: 15px;
+        }
+
+        .group-options {
+            display: flex;
             flex-wrap: wrap;
             gap: 20px;
         }
@@ -151,7 +170,7 @@
             h1 {
                 font-size: 2em;
             }
-            #meal-options {
+            .group-options {
                 flex-direction: column;
             }
         }
@@ -159,7 +178,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>¡Descubre Tu Plan Nutricional Perfecto! - Guía Personalizada para Comer Saludable</h1>
+        <h1>¡Tu Guía de Alimentación Personalizada!</h1>
         <form id="user-form">
             <label for="age">Edad (años):</label>
             <input type="number" id="age" min="10" max="60" required>
@@ -282,14 +301,14 @@
             'frutas secas': { hc: 20, prot: 19, fat: 54, fib: 9.3 }
         };
 
-        // Opciones de comidas variadas (con fuentes y per100 para cálculos)
+        // Opciones de comidas variadas, agrupadas para almuerzo y cena
         const mealOptions = {
             desayuno: [
-                { protein: 'huevos', protPer100: 12, carb: 'avena', carbPer100: 66, desc: 'Huevos revueltos con avena.', veggie: 'y una fruta mediana (ej. pera).' },
-                { protein: 'yogur entero', protPer100: 4, carb: 'pan salvado', carbPer100: 49, desc: 'Yogur entero con pan salvado.', veggie: 'y nueces (30g).' },
-                { protein: 'queso cottage', protPer100: 12, carb: 'frutas', carbPer100: 13, desc: 'Queso cottage con frutas.', veggie: 'y semillas (20g).' },
-                { protein: 'yogur descremado', protPer100: 4, carb: 'copos cereales', carbPer100: 86, desc: 'Yogur descremado con copos de cereales.', veggie: 'y bayas (100g).' },
-                { protein: 'leche entera', protPer100: 3, carb: 'pan', carbPer100: 52, desc: 'Leche entera con pan.', veggie: 'y queso (50g).' }
+                { protein: 'huevos', protPer100: 12, carb: 'avena', carbPer100: 66, desc: 'Huevos revueltos con avena.', veggie: 'una fruta mediana (ej. pera).' },
+                { protein: 'yogur entero', protPer100: 4, carb: 'pan salvado', carbPer100: 49, desc: 'Yogur entero con pan salvado.', veggie: 'nueces (30g).' },
+                { protein: 'queso cottage', protPer100: 12, carb: 'frutas', carbPer100: 13, desc: 'Queso cottage con frutas.', veggie: 'semillas (20g).' },
+                { protein: 'yogur descremado', protPer100: 4, carb: 'copos cereales', carbPer100: 86, desc: 'Yogur descremado con copos de cereales.', veggie: 'bayas (100g).' },
+                { protein: 'leche entera', protPer100: 3, carb: 'pan', carbPer100: 52, desc: 'Leche entera con pan.', veggie: 'queso (50g).' }
             ],
             colacion: [
                 { protein: 'nueces', protPer100: 19, carb: 'manzana', carbPer100: 13, desc: 'Nueces con una manzana.', fixedProt: false },
@@ -298,28 +317,38 @@
                 { protein: 'panqueques de proteina', protPer100: null, fixedProtAmount: 8, carb: 'frutas', carbPer100: 13, desc: 'Panqueques de proteína con frutas.', fixedProt: true },
                 { protein: 'queso semidescremado', protPer100: 12, carb: 'galletitas integrales', carbPer100: 66, desc: 'Queso con galletitas integrales.', fixedProt: false }
             ],
-            almuerzo: [
-                { protein: 'carne magra', protPer100: 20, carb: 'arroz', carbPer100: 74, desc: 'Carne magra con arroz integral.', veggie: 'y ensalada de tomate (100g de tomate).' },
-                { protein: 'carne magra', protPer100: 20, carb: 'papas', carbPer100: 20, desc: 'Carne magra con papas al horno.', veggie: 'y ensalada de lechuga (100g de lechuga).' },
-                { protein: 'carne magra', protPer100: 20, carb: 'fideos', carbPer100: 49, desc: 'Carne magra con fideos integrales.', veggie: 'y brócoli (150g).' },
-                { protein: 'carne magra', protPer100: 20, carb: 'lentejas', carbPer100: 61, desc: 'Carne magra con lentejas.', veggie: 'y espinacas (100g).' },
-                { protein: 'pescado', protPer100: 20, carb: 'arroz', carbPer100: 74, desc: 'Pescado a la plancha con arroz.', veggie: 'y ensalada mixta (lechuga 50g, tomate 50g, cebolla 50g - medio plato).' },
-                { protein: 'pescado', protPer100: 20, carb: 'papas', carbPer100: 20, desc: 'Pescado con papas.', veggie: 'y zanahorias (150g).' },
-                { protein: 'pescado', protPer100: 20, carb: 'fideos', carbPer100: 49, desc: 'Pescado con fideos.', veggie: 'y espárragos (150g).' },
-                { protein: 'pescado', protPer100: 20, carb: 'lentejas', carbPer100: 61, desc: 'Pescado con lentejas.', veggie: 'y ensalada mixta (lechuga 50g, tomate 50g, cebolla 50g - medio plato).' },
-                { protein: 'pechuga de pollo', protPer100: 21, carb: 'arroz', carbPer100: 74, desc: 'Pechuga de pollo con arroz.', veggie: 'y ensalada de tomate (100g).' },
-                { protein: 'pechuga de pollo', protPer100: 21, carb: 'papas', carbPer100: 20, desc: 'Pechuga de pollo con papas.', veggie: 'y lechuga (100g).' },
-                { protein: 'pechuga de pollo', protPer100: 21, carb: 'fideos', carbPer100: 49, desc: 'Pechuga de pollo con fideos.', veggie: 'y brócoli (150g).' },
-                { protein: 'pechuga de pollo', protPer100: 21, carb: 'lentejas', carbPer100: 61, desc: 'Pechuga de pollo con lentejas.', veggie: 'y espinacas (100g).' },
-                { protein: 'muslo de pollo', protPer100: 21, carb: 'arroz', carbPer100: 74, desc: 'Muslo de pollo con arroz.', veggie: 'y ensalada mixta (lechuga 50g, tomate 50g, cebolla 50g - medio plato).' },
-                { protein: 'muslo de pollo', protPer100: 21, carb: 'papas', carbPer100: 20, desc: 'Muslo de pollo con papas.', veggie: 'y zanahorias (150g).' },
-                { protein: 'muslo de pollo', protPer100: 21, carb: 'fideos', carbPer100: 49, desc: 'Muslo de pollo con fideos.', veggie: 'y espárragos (150g).' },
-                { protein: 'muslo de pollo', protPer100: 21, carb: 'lentejas', carbPer100: 61, desc: 'Muslo de pollo con lentejas.', veggie: 'y ensalada mixta (lechuga 50g, tomate 50g, cebolla 50g - medio plato).' },
-                { protein: 'carne de cerdo', protPer100: 20, carb: 'arroz', carbPer100: 74, desc: 'Carne de cerdo magra con arroz.', veggie: 'y brócoli (150g).' },
-                { protein: 'carne de cerdo', protPer100: 20, carb: 'papas', carbPer100: 20, desc: 'Carne de cerdo con papas al horno.', veggie: 'y espinacas (100g).' },
-                { protein: 'carne de cerdo', protPer100: 20, carb: 'fideos', carbPer100: 49, desc: 'Carne de cerdo con fideos.', veggie: 'y zanahorias (150g).' },
-                { protein: 'carne de cerdo', protPer100: 20, carb: 'lentejas', carbPer100: 61, desc: 'Carne de cerdo con lentejas.', veggie: 'y ensalada de tomate (100g).' }
-            ],
+            almuerzo: {
+                'Carne Magra': [
+                    { protein: 'carne magra', protPer100: 20, carb: 'arroz', carbPer100: 74, desc: 'Carne magra con arroz integral.', veggie: 'ensalada de tomate (100g de tomate).' },
+                    { protein: 'carne magra', protPer100: 20, carb: 'papas', carbPer100: 20, desc: 'Carne magra con papas al horno.', veggie: 'ensalada de lechuga (100g de lechuga).' },
+                    { protein: 'carne magra', protPer100: 20, carb: 'fideos', carbPer100: 49, desc: 'Carne magra con fideos integrales.', veggie: 'brócoli (150g).' },
+                    { protein: 'carne magra', protPer100: 20, carb: 'lentejas', carbPer100: 61, desc: 'Carne magra con lentejas.', veggie: 'espinacas (100g).' }
+                ],
+                'Pescado': [
+                    { protein: 'pescado', protPer100: 20, carb: 'arroz', carbPer100: 74, desc: 'Pescado a la plancha con arroz.', veggie: 'ensalada mixta (lechuga 50g, tomate 50g, cebolla 50g - medio plato).' },
+                    { protein: 'pescado', protPer100: 20, carb: 'papas', carbPer100: 20, desc: 'Pescado con papas.', veggie: 'zanahorias (150g).' },
+                    { protein: 'pescado', protPer100: 20, carb: 'fideos', carbPer100: 49, desc: 'Pescado con fideos.', veggie: 'espárragos (150g).' },
+                    { protein: 'pescado', protPer100: 20, carb: 'lentejas', carbPer100: 61, desc: 'Pescado con lentejas.', veggie: 'ensalada mixta (lechuga 50g, tomate 50g, cebolla 50g - medio plato).' }
+                ],
+                'Pechuga de Pollo': [
+                    { protein: 'pechuga de pollo', protPer100: 21, carb: 'arroz', carbPer100: 74, desc: 'Pechuga de pollo con arroz.', veggie: 'ensalada de tomate (100g).' },
+                    { protein: 'pechuga de pollo', protPer100: 21, carb: 'papas', carbPer100: 20, desc: 'Pechuga de pollo con papas.', veggie: 'lechuga (100g).' },
+                    { protein: 'pechuga de pollo', protPer100: 21, carb: 'fideos', carbPer100: 49, desc: 'Pechuga de pollo con fideos.', veggie: 'brócoli (150g).' },
+                    { protein: 'pechuga de pollo', protPer100: 21, carb: 'lentejas', carbPer100: 61, desc: 'Pechuga de pollo con lentejas.', veggie: 'espinacas (100g).' }
+                ],
+                'Muslo de Pollo': [
+                    { protein: 'muslo de pollo', protPer100: 21, carb: 'arroz', carbPer100: 74, desc: 'Muslo de pollo con arroz.', veggie: 'ensalada mixta (lechuga 50g, tomate 50g, cebolla 50g - medio plato).' },
+                    { protein: 'muslo de pollo', protPer100: 21, carb: 'papas', carbPer100: 20, desc: 'Muslo de pollo con papas.', veggie: 'zanahorias (150g).' },
+                    { protein: 'muslo de pollo', protPer100: 21, carb: 'fideos', carbPer100: 49, desc: 'Muslo de pollo con fideos.', veggie: 'espárragos (150g).' },
+                    { protein: 'muslo de pollo', protPer100: 21, carb: 'lentejas', carbPer100: 61, desc: 'Muslo de pollo con lentejas.', veggie: 'ensalada mixta (lechuga 50g, tomate 50g, cebolla 50g - medio plato).' }
+                ],
+                'Carne de Cerdo': [
+                    { protein: 'carne de cerdo', protPer100: 20, carb: 'arroz', carbPer100: 74, desc: 'Carne de cerdo magra con arroz.', veggie: 'brócoli (150g).' },
+                    { protein: 'carne de cerdo', protPer100: 20, carb: 'papas', carbPer100: 20, desc: 'Carne de cerdo con papas al horno.', veggie: 'espinacas (100g).' },
+                    { protein: 'carne de cerdo', protPer100: 20, carb: 'fideos', carbPer100: 49, desc: 'Carne de cerdo con fideos.', veggie: 'zanahorias (150g).' },
+                    { protein: 'carne de cerdo', protPer100: 20, carb: 'lentejas', carbPer100: 61, desc: 'Carne de cerdo con lentejas.', veggie: 'ensalada de tomate (100g).' }
+                ]
+            },
             merienda: [
                 { protein: 'queso crema', protPer100: 7, carb: 'galletitas', carbPer100: 62, desc: 'Queso crema con galletitas.', fixedProt: false },
                 { protein: 'hummus', protPer100: 22, carb: 'zanahorias', carbPer100: 11, desc: 'Hummus con zanahorias.', fixedProt: false },
@@ -327,28 +356,38 @@
                 { protein: 'panqueques de proteina', protPer100: null, fixedProtAmount: 8, carb: 'bayas', carbPer100: 13, desc: 'Panqueques de proteína con bayas.', fixedProt: true },
                 { protein: 'yogur entero', protPer100: 4, carb: 'barras cereal', carbPer100: 73, desc: 'Yogur con barra de cereal.', fixedProt: false }
             ],
-            cena: [
-                { protein: 'carne magra', protPer100: 20, carb: 'papas', carbPer100: 20, desc: 'Carne magra con papas.', veggie: 'y ensalada mixta (lechuga 50g, tomate 50g, cebolla 50g - medio plato).' },
-                { protein: 'carne magra', protPer100: 20, carb: 'arroz', carbPer100: 74, desc: 'Carne magra con arroz.', veggie: 'y lechuga (100g).' },
-                { protein: 'carne magra', protPer100: 20, carb: 'fideos', carbPer100: 49, desc: 'Carne magra con fideos.', veggie: 'y tomate (100g).' },
-                { protein: 'carne magra', protPer100: 20, carb: 'lentejas', carbPer100: 61, desc: 'Carne magra con lentejas.', veggie: 'y brócoli (150g).' },
-                { protein: 'pescado', protPer100: 20, carb: 'fideos', carbPer100: 49, desc: 'Pescado con fideos.', veggie: 'y vegetales mixtos (zanahoria 50g, brócoli 50g - medio plato).' },
-                { protein: 'pescado', protPer100: 20, carb: 'arroz', carbPer100: 74, desc: 'Pescado con arroz.', veggie: 'y espárragos (150g).' },
-                { protein: 'pescado', protPer100: 20, carb: 'papas', carbPer100: 20, desc: 'Pescado con papas.', veggie: 'y ensalada de tomate (100g).' },
-                { protein: 'pescado', protPer100: 20, carb: 'lentejas', carbPer100: 61, desc: 'Pescado con lentejas.', veggie: 'y espinacas (100g).' },
-                { protein: 'pechuga de pollo', protPer100: 21, carb: 'lentejas', carbPer100: 61, desc: 'Pechuga de pollo con lentejas.', veggie: 'y zanahorias (150g).' },
-                { protein: 'pechuga de pollo', protPer100: 21, carb: 'arroz', carbPer100: 74, desc: 'Pechuga de pollo con arroz.', veggie: 'y tomate (100g).' },
-                { protein: 'pechuga de pollo', protPer100: 21, carb: 'papas', carbPer100: 20, desc: 'Pechuga de pollo con papas.', veggie: 'y lechuga (100g).' },
-                { protein: 'pechuga de pollo', protPer100: 21, carb: 'fideos', carbPer100: 49, desc: 'Pechuga de pollo con fideos.', veggie: 'y brócoli (150g).' },
-                { protein: 'muslo de pollo', protPer100: 21, carb: 'arroz', carbPer100: 74, desc: 'Muslo de pollo con arroz integral.', veggie: 'y espinacas (100g).' },
-                { protein: 'muslo de pollo', protPer100: 21, carb: 'papas', carbPer100: 20, desc: 'Muslo de pollo con papas.', veggie: 'y tomate (100g).' },
-                { protein: 'muslo de pollo', protPer100: 21, carb: 'fideos', carbPer100: 49, desc: 'Muslo de pollo con fideos.', veggie: 'y zanahorias (150g).' },
-                { protein: 'muslo de pollo', protPer100: 21, carb: 'lentejas', carbPer100: 61, desc: 'Muslo de pollo con lentejas.', veggie: 'y ensalada mixta (lechuga 50g, tomate 50g, cebolla 50g - medio plato).' },
-                { protein: 'carne de cerdo', protPer100: 20, carb: 'papas', carbPer100: 20, desc: 'Carne de cerdo con papas al horno.', veggie: 'y brócoli (150g).' },
-                { protein: 'carne de cerdo', protPer100: 20, carb: 'arroz', carbPer100: 74, desc: 'Carne de cerdo con arroz.', veggie: 'y espinacas (100g).' },
-                { protein: 'carne de cerdo', protPer100: 20, carb: 'fideos', carbPer100: 49, desc: 'Carne de cerdo con fideos.', veggie: 'y lechuga (100g).' },
-                { protein: 'carne de cerdo', protPer100: 20, carb: 'lentejas', carbPer100: 61, desc: 'Carne de cerdo con lentejas.', veggie: 'y tomate (100g).' }
-            ]
+            cena: {
+                'Carne Magra': [
+                    { protein: 'carne magra', protPer100: 20, carb: 'papas', carbPer100: 20, desc: 'Carne magra con papas.', veggie: 'ensalada mixta (lechuga 50g, tomate 50g, cebolla 50g - medio plato).' },
+                    { protein: 'carne magra', protPer100: 20, carb: 'arroz', carbPer100: 74, desc: 'Carne magra con arroz.', veggie: 'lechuga (100g).' },
+                    { protein: 'carne magra', protPer100: 20, carb: 'fideos', carbPer100: 49, desc: 'Carne magra con fideos.', veggie: 'tomate (100g).' },
+                    { protein: 'carne magra', protPer100: 20, carb: 'lentejas', carbPer100: 61, desc: 'Carne magra con lentejas.', veggie: 'brócoli (150g).' }
+                ],
+                'Pescado': [
+                    { protein: 'pescado', protPer100: 20, carb: 'fideos', carbPer100: 49, desc: 'Pescado con fideos.', veggie: 'vegetales mixtos (zanahoria 50g, brócoli 50g - medio plato).' },
+                    { protein: 'pescado', protPer100: 20, carb: 'arroz', carbPer100: 74, desc: 'Pescado con arroz.', veggie: 'espárragos (150g).' },
+                    { protein: 'pescado', protPer100: 20, carb: 'papas', carbPer100: 20, desc: 'Pescado con papas.', veggie: 'ensalada de tomate (100g).' },
+                    { protein: 'pescado', protPer100: 20, carb: 'lentejas', carbPer100: 61, desc: 'Pescado con lentejas.', veggie: 'espinacas (100g).' }
+                ],
+                'Pechuga de Pollo': [
+                    { protein: 'pechuga de pollo', protPer100: 21, carb: 'lentejas', carbPer100: 61, desc: 'Pechuga de pollo con lentejas.', veggie: 'zanahorias (150g).' },
+                    { protein: 'pechuga de pollo', protPer100: 21, carb: 'arroz', carbPer100: 74, desc: 'Pechuga de pollo con arroz.', veggie: 'tomate (100g).' },
+                    { protein: 'pechuga de pollo', protPer100: 21, carb: 'papas', carbPer100: 20, desc: 'Pechuga de pollo con papas.', veggie: 'lechuga (100g).' },
+                    { protein: 'pechuga de pollo', protPer100: 21, carb: 'fideos', carbPer100: 49, desc: 'Pechuga de pollo con fideos.', veggie: 'brócoli (150g).' }
+                ],
+                'Muslo de Pollo': [
+                    { protein: 'muslo de pollo', protPer100: 21, carb: 'arroz', carbPer100: 74, desc: 'Muslo de pollo con arroz integral.', veggie: 'espinacas (100g).' },
+                    { protein: 'muslo de pollo', protPer100: 21, carb: 'papas', carbPer100: 20, desc: 'Muslo de pollo con papas.', veggie: 'tomate (100g).' },
+                    { protein: 'muslo de pollo', protPer100: 21, carb: 'fideos', carbPer100: 49, desc: 'Muslo de pollo con fideos.', veggie: 'zanahorias (150g).' },
+                    { protein: 'muslo de pollo', protPer100: 21, carb: 'lentejas', carbPer100: 61, desc: 'Muslo de pollo con lentejas.', veggie: 'ensalada mixta (lechuga 50g, tomate 50g, cebolla 50g - medio plato).' }
+                ],
+                'Carne de Cerdo': [
+                    { protein: 'carne de cerdo', protPer100: 20, carb: 'papas', carbPer100: 20, desc: 'Carne de cerdo con papas al horno.', veggie: 'brócoli (150g).' },
+                    { protein: 'carne de cerdo', protPer100: 20, carb: 'arroz', carbPer100: 74, desc: 'Carne de cerdo con arroz.', veggie: 'espinacas (100g).' },
+                    { protein: 'carne de cerdo', protPer100: 20, carb: 'fideos', carbPer100: 49, desc: 'Carne de cerdo con fideos.', veggie: 'lechuga (100g).' },
+                    { protein: 'carne de cerdo', protPer100: 20, carb: 'lentejas', carbPer100: 61, desc: 'Carne de cerdo con lentejas.', veggie: 'tomate (100g).' }
+                ]
+            }
         };
 
         // Frutas variadas para ejemplos
@@ -401,12 +440,16 @@
             switch (objective) {
                 case 'muscle': carbFactor *= 1.2; break;
                 case 'loss': carbFactor *= 0.8; break;
-                // tone y maintain sin cambio
+                case 'tone': carbFactor *= 0.8; break;
+                // maintain sin cambio
             }
             let carbs = (carbFactor * weight).toFixed(0);
 
             const fats = Math.max(0, (tdee - (proteins * 4) - (carbs * 4)) / 9).toFixed(0);
-            const fiber = 30;
+            let fiber = 30;
+            if (objective === 'loss' || objective === 'tone') {
+                fiber = 35; // Aumentar fibra para objetivos de pérdida/tonificación
+            }
 
             return { proteins, carbs, fats, fiber };
         }
@@ -463,59 +506,93 @@
                     mealCarbs = (mealCarbs * 0.7).toFixed(0);
                 }
 
-                mealOptions[meal].forEach((option, index) => {
-                    const div = document.createElement('div');
-                    div.classList.add('meal-option');
+                const options = mealOptions[meal];
+                if (Array.isArray(options)) {
+                    // Para comidas no agrupadas
+                    options.forEach((option, index) => {
+                        createMealOptionDiv(option, index, mealProteins, mealCarbs, mealOptionsDiv);
+                    });
+                } else {
+                    // Para almuerzo y cena, agrupadas
+                    Object.keys(options).forEach(group => {
+                        const groupDiv = document.createElement('div');
+                        groupDiv.classList.add('group-section');
 
-                    const h3 = document.createElement('h3');
-                    h3.textContent = `Opción ${index + 1}: ${option.desc}`;
-                    div.appendChild(h3);
+                        const groupH2 = document.createElement('h2');
+                        groupH2.textContent = group;
+                        groupDiv.appendChild(groupH2);
 
-                    const ul = document.createElement('ul');
+                        const groupOptionsDiv = document.createElement('div');
+                        groupOptionsDiv.classList.add('group-options');
 
-                    let protLi = document.createElement('li');
-                    let protAmountText = '';
-                    if (option.fixedProt) {
-                        protAmountText = `1 porción de ${option.protein}`;
-                    } else {
-                        const amountProt = Math.round((mealProteins * 100) / option.protPer100);
-                        protAmountText = `${amountProt}g de ${option.protein} (crudo)`;
-                    }
-                    protLi.innerHTML = `<strong>Proteína:</strong> ${protAmountText}`;
-                    ul.appendChild(protLi);
+                        options[group].forEach((option, index) => {
+                            createMealOptionDiv(option, index, mealProteins, mealCarbs, groupOptionsDiv);
+                        });
 
-                    let carbLi = document.createElement('li');
-                    const amountCarb = Math.round((mealCarbs * 100) / option.carbPer100);
-                    carbLi.innerHTML = `<strong>Carbohidrato:</strong> ${amountCarb}g de ${option.carb} (crudo)`;
-                    ul.appendChild(carbLi);
-
-                    let addVeggie = option.veggie || '';
-                    let addFruit = '';
-                    let randomFruit = fruits[Math.floor(Math.random() * fruits.length)];
-
-                    if (objective === 'muscle') {
-                        // Solo uno: preferir veggie
-                        let fibLi = document.createElement('li');
-                        fibLi.innerHTML = `<strong>Fibra:</strong> ${addVeggie}`;
-                        ul.appendChild(fibLi);
-                    } else if (objective === 'loss' || objective === 'tone') {
-                        // Agregar ambos para más fibra
-                        addFruit = ` y una fruta mediana como postre (ej. ${randomFruit}).`;
-                        let fibLi = document.createElement('li');
-                        fibLi.innerHTML = `<strong>Fibra:</strong> ${addVeggie}${addFruit}`;
-                        ul.appendChild(fibLi);
-                    } else {
-                        // Mantenimiento: agregar veggie
-                        let fibLi = document.createElement('li');
-                        fibLi.innerHTML = `<strong>Fibra:</strong> ${addVeggie}`;
-                        ul.appendChild(fibLi);
-                    }
-
-                    div.appendChild(ul);
-                    mealOptionsDiv.appendChild(div);
-                });
+                        groupDiv.appendChild(groupOptionsDiv);
+                        mealOptionsDiv.appendChild(groupDiv);
+                    });
+                }
             }
         });
+
+        function createMealOptionDiv(option, index, mealProteins, mealCarbs, parentDiv) {
+            const div = document.createElement('div');
+            div.classList.add('meal-option');
+
+            const h3 = document.createElement('h3');
+            h3.textContent = `Opción ${index + 1}: ${option.desc}`;
+            div.appendChild(h3);
+
+            const ul = document.createElement('ul');
+
+            let protLi = document.createElement('li');
+            let protAmountText = '';
+            if (option.fixedProt) {
+                protAmountText = `1 porción de ${option.protein}`;
+            } else {
+                const amountProt = Math.round((mealProteins * 100) / option.protPer100);
+                protAmountText = `${amountProt}g de ${option.protein} (peso crudo)`;
+            }
+            protLi.innerHTML = `<strong>Proteína:</strong> ${protAmountText}`;
+            ul.appendChild(protLi);
+
+            let carbLi = document.createElement('li');
+            const amountCarb = Math.round((mealCarbs * 100) / option.carbPer100);
+            carbLi.innerHTML = `<strong>Carbohidrato:</strong> ${amountCarb}g de ${option.carb} (peso crudo)`;
+            ul.appendChild(carbLi);
+
+            let addVeggie = option.veggie ? option.veggie.replace(/^y /, '') : '';
+            let addFruit = '';
+            let randomFruit = fruits[Math.floor(Math.random() * fruits.length)];
+
+            if (objective === 'muscle') {
+                // Solo veggie
+                if (addVeggie) {
+                    let fibLi = document.createElement('li');
+                    fibLi.innerHTML = `<strong>Fibra:</strong> ${addVeggie}`;
+                    ul.appendChild(fibLi);
+                }
+            } else if (objective === 'loss' || objective === 'tone') {
+                // Veggie + fruit
+                addFruit = `una fruta mediana como postre (ej. ${randomFruit}).`;
+                if (addVeggie || addFruit) {
+                    let fibLi = document.createElement('li');
+                    fibLi.innerHTML = `<strong>Fibra:</strong> ${addVeggie} ${addFruit}`;
+                    ul.appendChild(fibLi);
+                }
+            } else {
+                // Mantenimiento: veggie
+                if (addVeggie) {
+                    let fibLi = document.createElement('li');
+                    fibLi.innerHTML = `<strong>Fibra:</strong> ${addVeggie}`;
+                    ul.appendChild(fibLi);
+                }
+            }
+
+            div.appendChild(ul);
+            parentDiv.appendChild(div);
+        }
     </script>
 </body>
 </html>
