@@ -65,16 +65,33 @@
 <body>
     <h1>Guía Nutricional Personalizada</h1>
     <form id="user-form">
+        <label for="age">Edad (años):</label>
+        <input type="number" id="age" min="10" max="60" required>
+
+        <label for="sex">Sexo:</label>
+        <select id="sex" required>
+            <option value="male">Hombre</option>
+            <option value="female">Mujer</option>
+        </select>
+
         <label for="weight">Peso (kg):</label>
         <input type="number" id="weight" required>
 
         <label for="height">Talla (cm):</label>
         <input type="number" id="height" required>
 
+        <label for="objective">Objetivo:</label>
+        <select id="objective" required>
+            <option value="muscle">Aumento de masa muscular</option>
+            <option value="loss">Pérdida de grasa y descenso de peso</option>
+            <option value="tone">Tonificar</option>
+            <option value="maintain">Mantenimiento</option>
+        </select>
+
         <label for="training-days">Días de entrenamiento por semana:</label>
         <input type="number" id="training-days" min="0" max="7" required>
 
-        <label for="training-duration">Duración del entrenamiento (minutos):</label>
+        <label for="training-duration">Duración del entrenamiento (minutos por sesión):</label>
         <input type="number" id="training-duration" required>
 
         <label for="time-of-day">Momento del día para entrenamiento:</label>
@@ -119,65 +136,179 @@
     </div>
 
     <script>
-        // Datos de opciones de comidas (hardcoded para simplicidad)
+        // Base de datos de alimentos (macros por 100g)
+        const foods = {
+            // Lácteos
+            'yogur entero': { hc: 12, prot: 4, fat: 2, fib: 0 },
+            'yogur descremado': { hc: 6, prot: 4, fat: 0, fib: 0 },
+            'leche parcial': { hc: 5, prot: 3, fat: 1, fib: 0 },
+            'leche entera': { hc: 5, prot: 3, fat: 3, fib: 0 },
+            'ricota': { hc: 4, prot: 12, fat: 12, fib: 0 },
+            'queso crema': { hc: 4, prot: 7, fat: 23, fib: 0 },
+            'queso semidescremado': { hc: 6, prot: 12, fat: 4, fib: 0 },
+            'queso blanda': { hc: 2, prot: 21, fat: 22, fib: 0 },
+            'queso semidura': { hc: 0, prot: 24, fat: 30, fib: 0 },
+            'queso dura': { hc: 3, prot: 31, fat: 27, fib: 0 },
+            'queso promedio': { hc: 3, prot: 22, fat: 21, fib: 0 },
+            // Carnes y huevos
+            'huevo': { hc: 0, prot: 12, fat: 12, fib: 0 },
+            'cerdo': { hc: 0, prot: 20, fat: 19, fib: 0 },
+            'vacuna': { hc: 0, prot: 20, fat: 10, fib: 0 },
+            'ave': { hc: 0, prot: 21, fat: 4, fib: 0 },
+            'pescado': { hc: 0, prot: 20, fat: 3, fib: 0 },
+            'visceras': { hc: 3, prot: 17, fat: 14, fib: 0 },
+            'mariscos': { hc: 0, prot: 18, fat: 1, fib: 0 },
+            'carnes promedio': { hc: 0, prot: 21, fat: 6, fib: 0 },
+            // Verduras, frutas, cereales
+            'hortalizas a': { hc: 4, prot: 2, fat: 0, fib: 1.86 },
+            'hortalizas b': { hc: 11, prot: 5, fat: 1, fib: 3.19 },
+            'hortalizas c': { hc: 20, prot: 3, fat: 0, fib: 2.47 },
+            'frutas': { hc: 13, prot: 1, fat: 0, fib: 2.15 },
+            'cereales': { hc: 74, prot: 10, fat: 2, fib: 6.3 },
+            'cereales integrales': { hc: 73, prot: 12, fat: 2, fib: 8.68 },
+            'amasados': { hc: 49, prot: 8, fat: 9, fib: 3 },
+            'legumbres': { hc: 61, prot: 22, fat: 3, fib: 18.23 },
+            'soja': { hc: 30, prot: 36, fat: 20, fib: 9.3 },
+            'milanesa soja': { hc: 40, prot: 29, fat: 15, fib: 2.92 },
+            'pan': { hc: 52, prot: 8, fat: 2, fib: 2.63 },
+            'pan salvado': { hc: 49, prot: 10, fat: 3, fib: 8.05 },
+            // Galletitas, etc.
+            'galletitas blanca': { hc: 62, prot: 14, fat: 16, fib: 2 },
+            'galletitas integrales': { hc: 66, prot: 11, fat: 16, fib: 9.8 },
+            'alfajor': { hc: 71, prot: 8, fat: 14, fib: 0.7 },
+            'galletitas dulces': { hc: 72, prot: 5, fat: 20, fib: 1.5 },
+            'copos cereales': { hc: 86, prot: 7, fat: 1, fib: 3.5 },
+            'barras cereal': { hc: 73, prot: 4, fat: 8, fib: 2.1 },
+            'quinua': { hc: 69, prot: 13, fat: 6, fib: 5.9 },
+            'salvado avena': { hc: 66, prot: 17, fat: 7, fib: 15.4 },
+            'frutas oleosas': { hc: 7, prot: 2, fat: 25, fib: 4.77 },
+            'frutas secas': { hc: 20, prot: 19, fat: 54, fib: 9.3 }
+        };
+
+        // Opciones de comidas variadas (con fuentes y per100 para cálculos)
         const mealOptions = {
             desayuno: [
-                { protein: 'huevos', amount: '2-3 unidades', carb: 'avena', carbAmount: '40g', desc: 'Huevos revueltos con avena y frutas.' },
-                { protein: 'yogur', amount: '200g', carb: 'pan integral', carbAmount: '2 rebanadas', desc: 'Yogur griego con pan integral y nueces.' },
-                { protein: 'queso cottage', amount: '150g', carb: 'frutas', carbAmount: '1 pieza', desc: 'Queso cottage con frutas y semillas.' }
+                { protein: 'huevos', protPer100: 12, carb: 'avena (salvado)', carbPer100: 66, desc: 'Huevos revueltos con avena y frutas.', veggie: 'frutas', fibAdd: 2.15 },
+                { protein: 'yogur entero', protPer100: 4, carb: 'pan salvado', carbPer100: 49, desc: 'Yogur entero con pan salvado y nueces.', veggie: 'frutas oleosas', fibAdd: 4.77 },
+                { protein: 'queso cottage (ricota)', protPer100: 12, carb: 'frutas', carbPer100: 13, desc: 'Queso cottage con frutas y semillas.', veggie: 'hortalizas a', fibAdd: 1.86 },
+                { protein: 'yogur descremado', protPer100: 4, carb: 'copos cereales', carbPer100: 86, desc: 'Yogur descremado con copos de cereales.', veggie: 'frutas', fibAdd: 2.15 },
+                { protein: 'leche entera', protPer100: 3, carb: 'pan', carbPer100: 52, desc: 'Leche entera con pan y queso.', veggie: 'frutas secas', fibAdd: 9.3 }
             ],
             colacion: [
-                { protein: 'nueces', amount: '30g', carb: 'manzana', carbAmount: '1 unidad', desc: 'Mezcla de nueces con una manzana.' },
-                { protein: 'yogur', amount: '150g', carb: 'bayas', carbAmount: '100g', desc: 'Yogur con bayas frescas.' },
-                { protein: 'barra proteica', amount: '1 unidad', carb: 'plátano', carbAmount: '1 unidad', desc: 'Barra proteica con plátano.' }
+                { protein: 'nueces (frutas secas)', protPer100: 19, carb: 'manzana (frutas)', carbPer100: 13, desc: 'Nueces con una manzana.', fixedProt: false },
+                { protein: 'yogur entero', protPer100: 4, carb: 'bayas (frutas)', carbPer100: 13, desc: 'Yogur con bayas frescas.', fixedProt: false },
+                { protein: 'batido de proteina', protPer100: null, fixedProtAmount: 25, carb: 'plátano (frutas)', carbPer100: 13, desc: 'Batido de proteína con plátano.', fixedProt: true },
+                { protein: 'panqueques de proteina', protPer100: null, fixedProtAmount: 8, carb: 'frutas', carbPer100: 13, desc: 'Panqueques de proteína con frutas.', fixedProt: true },
+                { protein: 'queso semidescremado', protPer100: 12, carb: 'galletitas integrales', carbPer100: 66, desc: 'Queso con galletitas integrales.', fixedProt: false }
             ],
             almuerzo: [
-                { protein: 'carne magra', amount: '150g', carb: 'arroz', carbAmount: '100g', desc: 'Carne magra con arroz integral y vegetales.' },
-                { protein: 'pescado', amount: '150g', carb: 'papas', carbAmount: '200g', desc: 'Pescado a la plancha con papas al horno.' },
-                { protein: 'pechuga de pollo', amount: '150g', carb: 'fideos', carbAmount: '100g', desc: 'Pechuga de pollo con fideos integrales.' },
-                { protein: 'muslo de pollo', amount: '150g', carb: 'lentejas', carbAmount: '100g', desc: 'Muslo de pollo con lentejas y ensalada.' },
-                { protein: 'carne de cerdo', amount: '150g', carb: 'arroz', carbAmount: '100g', desc: 'Carne de cerdo magra con arroz y brócoli.' },
-                { protein: 'pescado', amount: '150g', carb: 'lentejas', carbAmount: '100g', desc: 'Pescado con lentejas y espinacas.' }
+                { protein: 'carne magra (vacuna)', protPer100: 20, carb: 'arroz (cereales)', carbPer100: 74, desc: 'Carne magra con arroz integral y ensalada de tomate.', veggie: 'hortalizas a (tomate)', fibAdd: 1.86 },
+                { protein: 'carne magra (vacuna)', protPer100: 20, carb: 'papas (hortalizas c)', carbPer100: 20, desc: 'Carne magra con papas al horno y ensalada de lechuga.', veggie: 'hortalizas a (lechuga)', fibAdd: 1.86 },
+                { protein: 'carne magra (vacuna)', protPer100: 20, carb: 'fideos (amasados)', carbPer100: 49, desc: 'Carne magra con fideos integrales y brócoli.', veggie: 'hortalizas b (brócoli)', fibAdd: 3.19 },
+                { protein: 'carne magra (vacuna)', protPer100: 20, carb: 'lentejas (legumbres)', carbPer100: 61, desc: 'Carne magra con lentejas y espinacas.', veggie: 'hortalizas a (espinacas)', fibAdd: 1.86 },
+                { protein: 'pescado', protPer100: 20, carb: 'arroz (cereales)', carbPer100: 74, desc: 'Pescado a la plancha con arroz y ensalada de tomate y lechuga.', veggie: 'hortalizas a (tomate y lechuga)', fibAdd: 1.86 },
+                { protein: 'pescado', protPer100: 20, carb: 'papas (hortalizas c)', carbPer100: 20, desc: 'Pescado con papas y zanahorias.', veggie: 'hortalizas b (zanahorias)', fibAdd: 3.19 },
+                { protein: 'pescado', protPer100: 20, carb: 'fideos (amasados)', carbPer100: 49, desc: 'Pescado con fideos y espárragos.', veggie: 'hortalizas b (espárragos)', fibAdd: 3.19 },
+                { protein: 'pescado', protPer100: 20, carb: 'lentejas (legumbres)', carbPer100: 61, desc: 'Pescado con lentejas y ensalada mixta.', veggie: 'hortalizas a (mixta)', fibAdd: 1.86 },
+                { protein: 'pechuga de pollo (ave)', protPer100: 21, carb: 'arroz (cereales)', carbPer100: 74, desc: 'Pechuga de pollo con arroz y ensalada de tomate.', veggie: 'hortalizas a (tomate)', fibAdd: 1.86 },
+                { protein: 'pechuga de pollo (ave)', protPer100: 21, carb: 'papas (hortalizas c)', carbPer100: 20, desc: 'Pechuga de pollo con papas y lechuga.', veggie: 'hortalizas a (lechuga)', fibAdd: 1.86 },
+                { protein: 'pechuga de pollo (ave)', protPer100: 21, carb: 'fideos (amasados)', carbPer100: 49, desc: 'Pechuga de pollo con fideos y brócoli.', veggie: 'hortalizas b (brócoli)', fibAdd: 3.19 },
+                { protein: 'pechuga de pollo (ave)', protPer100: 21, carb: 'lentejas (legumbres)', carbPer100: 61, desc: 'Pechuga de pollo con lentejas y espinacas.', veggie: 'hortalizas a (espinacas)', fibAdd: 1.86 },
+                { protein: 'muslo de pollo (ave)', protPer100: 21, carb: 'arroz (cereales)', carbPer100: 74, desc: 'Muslo de pollo con arroz y ensalada de tomate y cebolla.', veggie: 'hortalizas a (tomate y cebolla)', fibAdd: 1.86 },
+                { protein: 'muslo de pollo (ave)', protPer100: 21, carb: 'papas (hortalizas c)', carbPer100: 20, desc: 'Muslo de pollo con papas y zanahorias.', veggie: 'hortalizas b (zanahorias)', fibAdd: 3.19 },
+                { protein: 'muslo de pollo (ave)', protPer100: 21, carb: 'fideos (amasados)', carbPer100: 49, desc: 'Muslo de pollo con fideos y espárragos.', veggie: 'hortalizas b (espárragos)', fibAdd: 3.19 },
+                { protein: 'muslo de pollo (ave)', protPer100: 21, carb: 'lentejas (legumbres)', carbPer100: 61, desc: 'Muslo de pollo con lentejas y ensalada mixta.', veggie: 'hortalizas a (mixta)', fibAdd: 1.86 },
+                { protein: 'carne de cerdo', protPer100: 20, carb: 'arroz (cereales)', carbPer100: 74, desc: 'Carne de cerdo magra con arroz y brócoli.', veggie: 'hortalizas b (brócoli)', fibAdd: 3.19 },
+                { protein: 'carne de cerdo', protPer100: 20, carb: 'papas (hortalizas c)', carbPer100: 20, desc: 'Carne de cerdo con papas al horno y espinacas.', veggie: 'hortalizas a (espinacas)', fibAdd: 1.86 },
+                { protein: 'carne de cerdo', protPer100: 20, carb: 'fideos (amasados)', carbPer100: 49, desc: 'Carne de cerdo con fideos y zanahorias.', veggie: 'hortalizas b (zanahorias)', fibAdd: 3.19 },
+                { protein: 'carne de cerdo', protPer100: 20, carb: 'lentejas (legumbres)', carbPer100: 61, desc: 'Carne de cerdo con lentejas y ensalada de tomate.', veggie: 'hortalizas a (tomate)', fibAdd: 1.86 }
             ],
             merienda: [
-                { protein: 'queso', amount: '50g', carb: 'galletas integrales', carbAmount: '4 unidades', desc: 'Queso con galletas integrales.' },
-                { protein: 'hummus', amount: '100g', carb: 'zanahorias', carbAmount: '2 unidades', desc: 'Hummus con zanahorias.' },
-                { protein: 'batido proteico', amount: '1 porción', carb: 'frutas', carbAmount: '100g', desc: 'Batido proteico con frutas.' }
+                { protein: 'queso crema', protPer100: 7, carb: 'galletitas blanca', carbPer100: 62, desc: 'Queso crema con galletitas.', fixedProt: false },
+                { protein: 'hummus (legumbres base)', protPer100: 22, carb: 'zanahorias (hortalizas b)', carbPer100: 11, desc: 'Hummus con zanahorias.', fixedProt: false },
+                { protein: 'batido de proteina', protPer100: null, fixedProtAmount: 25, carb: 'frutas', carbPer100: 13, desc: 'Batido proteico con frutas.', fixedProt: true },
+                { protein: 'panqueques de proteina', protPer100: null, fixedProtAmount: 8, carb: 'bayas (frutas)', carbPer100: 13, desc: 'Panqueques de proteína con bayas.', fixedProt: true },
+                { protein: 'yogur entero', protPer100: 4, carb: 'barras cereal', carbPer100: 73, desc: 'Yogur con barra de cereal.', fixedProt: false }
             ],
             cena: [
-                { protein: 'carne magra', amount: '150g', carb: 'papas', carbAmount: '200g', desc: 'Carne magra con papas y ensalada.' },
-                { protein: 'pescado', amount: '150g', carb: 'fideos', carbAmount: '100g', desc: 'Pescado con fideos y vegetales.' },
-                { protein: 'pechuga de pollo', amount: '150g', carb: 'lentejas', carbAmount: '100g', desc: 'Pechuga de pollo con lentejas.' },
-                { protein: 'muslo de pollo', amount: '150g', carb: 'arroz', carbAmount: '100g', desc: 'Muslo de pollo con arroz integral.' },
-                { protein: 'carne de cerdo', amount: '150g', carb: 'papas', carbAmount: '200g', desc: 'Carne de cerdo con papas al horno.' },
-                { protein: 'pescado', amount: '150g', carb: 'arroz', carbAmount: '100g', desc: 'Pescado con arroz y espárragos.' }
+                { protein: 'carne magra (vacuna)', protPer100: 20, carb: 'papas (hortalizas c)', carbPer100: 20, desc: 'Carne magra con papas y ensalada mixta.', veggie: 'hortalizas a (mixta)', fibAdd: 1.86 },
+                { protein: 'carne magra (vacuna)', protPer100: 20, carb: 'arroz (cereales)', carbPer100: 74, desc: 'Carne magra con arroz y lechuga.', veggie: 'hortalizas a (lechuga)', fibAdd: 1.86 },
+                { protein: 'carne magra (vacuna)', protPer100: 20, carb: 'fideos (amasados)', carbPer100: 49, desc: 'Carne magra con fideos y tomate.', veggie: 'hortalizas a (tomate)', fibAdd: 1.86 },
+                { protein: 'carne magra (vacuna)', protPer100: 20, carb: 'lentejas (legumbres)', carbPer100: 61, desc: 'Carne magra con lentejas y brócoli.', veggie: 'hortalizas b (brócoli)', fibAdd: 3.19 },
+                { protein: 'pescado', protPer100: 20, carb: 'fideos (amasados)', carbPer100: 49, desc: 'Pescado con fideos y vegetales mixtos.', veggie: 'hortalizas b (mixtos)', fibAdd: 3.19 },
+                { protein: 'pescado', protPer100: 20, carb: 'arroz (cereales)', carbPer100: 74, desc: 'Pescado con arroz y espárragos.', veggie: 'hortalizas b (espárragos)', fibAdd: 3.19 },
+                { protein: 'pescado', protPer100: 20, carb: 'papas (hortalizas c)', carbPer100: 20, desc: 'Pescado con papas y ensalada de tomate.', veggie: 'hortalizas a (tomate)', fibAdd: 1.86 },
+                { protein: 'pescado', protPer100: 20, carb: 'lentejas (legumbres)', carbPer100: 61, desc: 'Pescado con lentejas y espinacas.', veggie: 'hortalizas a (espinacas)', fibAdd: 1.86 },
+                { protein: 'pechuga de pollo (ave)', protPer100: 21, carb: 'lentejas (legumbres)', carbPer100: 61, desc: 'Pechuga de pollo con lentejas y zanahorias.', veggie: 'hortalizas b (zanahorias)', fibAdd: 3.19 },
+                { protein: 'pechuga de pollo (ave)', protPer100: 21, carb: 'arroz (cereales)', carbPer100: 74, desc: 'Pechuga de pollo con arroz y tomate.', veggie: 'hortalizas a (tomate)', fibAdd: 1.86 },
+                { protein: 'pechuga de pollo (ave)', protPer100: 21, carb: 'papas (hortalizas c)', carbPer100: 20, desc: 'Pechuga de pollo con papas y lechuga.', veggie: 'hortalizas a (lechuga)', fibAdd: 1.86 },
+                { protein: 'pechuga de pollo (ave)', protPer100: 21, carb: 'fideos (amasados)', carbPer100: 49, desc: 'Pechuga de pollo con fideos y brócoli.', veggie: 'hortalizas b (brócoli)', fibAdd: 3.19 },
+                { protein: 'muslo de pollo (ave)', protPer100: 21, carb: 'arroz (cereales)', carbPer100: 74, desc: 'Muslo de pollo con arroz integral y espinacas.', veggie: 'hortalizas a (espinacas)', fibAdd: 1.86 },
+                { protein: 'muslo de pollo (ave)', protPer100: 21, carb: 'papas (hortalizas c)', carbPer100: 20, desc: 'Muslo de pollo con papas y tomate.', veggie: 'hortalizas a (tomate)', fibAdd: 1.86 },
+                { protein: 'muslo de pollo (ave)', protPer100: 21, carb: 'fideos (amasados)', carbPer100: 49, desc: 'Muslo de pollo con fideos y zanahorias.', veggie: 'hortalizas b (zanahorias)', fibAdd: 3.19 },
+                { protein: 'muslo de pollo (ave)', protPer100: 21, carb: 'lentejas (legumbres)', carbPer100: 61, desc: 'Muslo de pollo con lentejas y ensalada mixta.', veggie: 'hortalizas a (mixta)', fibAdd: 1.86 },
+                { protein: 'carne de cerdo', protPer100: 20, carb: 'papas (hortalizas c)', carbPer100: 20, desc: 'Carne de cerdo con papas al horno y brócoli.', veggie: 'hortalizas b (brócoli)', fibAdd: 3.19 },
+                { protein: 'carne de cerdo', protPer100: 20, carb: 'arroz (cereales)', carbPer100: 74, desc: 'Carne de cerdo con arroz y espinacas.', veggie: 'hortalizas a (espinacas)', fibAdd: 1.86 },
+                { protein: 'carne de cerdo', protPer100: 20, carb: 'fideos (amasados)', carbPer100: 49, desc: 'Carne de cerdo con fideos y lechuga.', veggie: 'hortalizas a (lechuga)', fibAdd: 1.86 },
+                { protein: 'carne de cerdo', protPer100: 20, carb: 'lentejas (legumbres)', carbPer100: 61, desc: 'Carne de cerdo con lentejas y tomate.', veggie: 'hortalizas a (tomate)', fibAdd: 1.86 }
             ]
         };
 
-        // Fórmulas de cálculo (simplificadas y estándar)
+        // Fórmulas de cálculo
         function calculateBMI(weight, height) {
-            height = height / 100; // cm to m
+            height = height / 100;
             return (weight / (height * height)).toFixed(2);
         }
 
-        function calculateBMR(weight, height, age = 30, gender = 'male') { // Asumiendo edad 30 y masculino por defecto
-            return 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age); // Harris-Benedict para hombres
+        function calculateBMR(weight, age, sex) {
+            let bmr;
+            if (age >= 10 && age < 18) {
+                bmr = sex === 'male' ? 17.5 * weight + 651 : 12.2 * weight + 746;
+            } else if (age >= 18 && age < 30) {
+                bmr = sex === 'male' ? 15.3 * weight + 679 : 14.7 * weight + 496;
+            } else if (age >= 30 && age <= 60) {
+                bmr = sex === 'male' ? 11.6 * weight + 879 : 8.7 * weight + 829;
+            } else {
+                bmr = 1500; // Default
+            }
+            return bmr;
         }
 
-        function calculateTDEE(bmr, trainingDays, trainingDuration, walks) {
-            let activityLevel = 1.2; // Sedentario por defecto
-            if (trainingDays >= 3) activityLevel = 1.55; // Moderado
-            if (trainingDays >= 5) activityLevel = 1.725; // Activo
-            activityLevel += (walks / 60 * 0.1); // Ajuste por caminatas
+        function calculateTDEE(bmr, hours) {
+            let activityLevel = 1.2;
+            if (hours >= 3 && hours < 5) activityLevel = 1.375;
+            if (hours >= 5 && hours < 7) activityLevel = 1.55;
+            if (hours >= 7) activityLevel = 1.725;
             return bmr * activityLevel;
         }
 
-        function calculateMacros(tdee, weight, meals) {
-            const proteins = (1.8 * weight).toFixed(0); // 1.8g/kg
-            const fats = (0.8 * weight).toFixed(0); // 0.8g/kg
-            const fiber = 30; // Fijo 30g
-            const carbs = ((tdee - (proteins * 4) - (fats * 9)) / 4 / meals).toFixed(0); // Carbs por comida approx
-            return { proteins, carbs: (carbs * meals).toFixed(0), fats, fiber };
+        function calculateMacros(tdee, weight, objective, meals, hours) {
+            let protMin, protMax;
+            switch (objective) {
+                case 'muscle': protMin = 1.6; protMax = 2; break;
+                case 'loss': protMin = 1.6; protMax = 1.8; break;
+                case 'tone': protMin = 1.4; protMax = 1.8; break;
+                case 'maintain': protMin = 1.2; protMax = 1.4; break;
+            }
+            const proteins = (((protMin + protMax) / 2) * weight).toFixed(0);
+
+            let carbFactor = 3; // Base bajo
+            if (hours >= 3 && hours < 5) carbFactor = 4.5;
+            if (hours >= 5 && hours < 7) carbFactor = 5.5;
+            if (hours >= 7 && hours < 14) carbFactor = 6.5;
+            if (hours >= 14) carbFactor = 7;
+
+            switch (objective) {
+                case 'muscle': carbFactor *= 1.2; break;
+                case 'loss': carbFactor *= 0.8; break;
+                // tone y maintain sin cambio
+            }
+            let carbs = (carbFactor * weight).toFixed(0);
+
+            const fats = Math.max(0, (tdee - (proteins * 4) - (carbs * 4)) / 9).toFixed(0);
+            const fiber = 30;
+
+            return { proteins, carbs, fats, fiber };
         }
 
         // Manejo del formulario
@@ -187,20 +318,28 @@
         const mealOptionsDiv = document.getElementById('meal-options');
 
         let dailyMacros = {};
+        let numMeals = 4;
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
+            const age = parseInt(document.getElementById('age').value);
+            const sex = document.getElementById('sex').value;
             const weight = parseFloat(document.getElementById('weight').value);
             const height = parseFloat(document.getElementById('height').value);
+            const objective = document.getElementById('objective').value;
             const trainingDays = parseInt(document.getElementById('training-days').value);
             const trainingDuration = parseInt(document.getElementById('training-duration').value);
             const walks = parseInt(document.getElementById('walks').value);
-            const meals = parseInt(document.getElementById('meals').value);
+            numMeals = parseInt(document.getElementById('meals').value);
+
+            const weeklyTrainingHours = trainingDays * (trainingDuration / 60);
+            const weeklyWalksHours = 7 * (walks / 60);
+            const totalHours = weeklyTrainingHours + weeklyWalksHours;
 
             const bmi = calculateBMI(weight, height);
-            const bmr = calculateBMR(weight, height);
-            const tdee = calculateTDEE(bmr, trainingDays, trainingDuration, walks);
-            dailyMacros = calculateMacros(tdee, weight, meals);
+            const bmr = calculateBMR(weight, age, sex);
+            const tdee = calculateTDEE(bmr, totalHours);
+            dailyMacros = calculateMacros(tdee, weight, objective, numMeals, totalHours);
 
             document.getElementById('bmi').textContent = `IMC: ${bmi}`;
             document.getElementById('calories').textContent = `Calorías diarias estimadas: ${tdee.toFixed(0)} kcal`;
@@ -216,13 +355,29 @@
             const meal = e.target.value;
             mealOptionsDiv.innerHTML = '';
             if (meal && mealOptions[meal]) {
+                const mealProteins = (dailyMacros.proteins / numMeals).toFixed(0);
+                const mealCarbs = (dailyMacros.carbs / numMeals).toFixed(0);
+
                 mealOptions[meal].forEach(option => {
                     const div = document.createElement('div');
                     div.classList.add('meal-option');
-                    // Ajustar cantidades basadas en macros (simplificado: dividir diario por comidas)
-                    const mealProteins = (dailyMacros.proteins / parseInt(document.getElementById('meals').value)).toFixed(0);
-                    const mealCarbs = (dailyMacros.carbs / parseInt(document.getElementById('meals').value)).toFixed(0);
-                    div.textContent = `${option.desc} - Proteína: ${mealProteins}g (${option.protein}), Carbs: ${mealCarbs}g (${option.carb})`;
+
+                    let protAmountText = '';
+                    if (option.fixedProt) {
+                        protAmountText = `1 porción de ${option.protein} (25g proteína para batido, 8g para panqueques)`;
+                    } else {
+                        const amountProt = Math.round((mealProteins * 100) / option.protPer100);
+                        protAmountText = `${amountProt}g de ${option.protein} (crudo)`;
+                    }
+
+                    const amountCarb = Math.round((mealCarbs * 100) / option.carbPer100);
+                    let text = `${option.desc} - ${protAmountText}, ${amountCarb}g de ${option.carb} (crudo).`;
+
+                    if (meal === 'almuerzo' || meal === 'cena') {
+                        text += ` Opcional: agrega una fruta como postre para más fibra (aprox. ${option.fibAdd || 2.15}g por 100g).`;
+                    }
+
+                    div.textContent = text;
                     mealOptionsDiv.appendChild(div);
                 });
             }
