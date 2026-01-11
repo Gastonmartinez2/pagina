@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Nutricional Personalizada</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #results {
+            max-width: 600px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #meal-options {
+            margin-top: 20px;
+        }
+        .meal-option {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Guía Nutricional Personalizada</h1>
+    <form id="user-form">
+        <label for="weight">Peso (kg):</label>
+        <input type="number" id="weight" required>
+
+        <label for="height">Talla (cm):</label>
+        <input type="number" id="height" required>
+
+        <label for="training-days">Días de entrenamiento por semana:</label>
+        <input type="number" id="training-days" min="0" max="7" required>
+
+        <label for="training-duration">Duración del entrenamiento (minutos):</label>
+        <input type="number" id="training-duration" required>
+
+        <label for="time-of-day">Momento del día para entrenamiento:</label>
+        <select id="time-of-day">
+            <option value="mañana">Mañana</option>
+            <option value="tarde">Tarde</option>
+            <option value="noche">Noche</option>
+        </select>
+
+        <label for="meals">Número de comidas al día:</label>
+        <select id="meals">
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+
+        <label for="walks">¿Realiza caminatas? (minutos por día):</label>
+        <input type="number" id="walks" min="0" value="0" required>
+
+        <button type="submit">Calcular Requerimientos</button>
+    </form>
+
+    <div id="results" style="display: none;">
+        <h2>Resultados</h2>
+        <p id="bmi"></p>
+        <p id="calories"></p>
+        <p id="proteins"></p>
+        <p id="carbs"></p>
+        <p id="fats"></p>
+        <p id="fiber"></p>
+
+        <h2>Selecciona una Comida</h2>
+        <select id="meal-select">
+            <option value="">--Selecciona--</option>
+            <option value="desayuno">Desayuno</option>
+            <option value="colacion">Colación (Snack Mañana)</option>
+            <option value="almuerzo">Almuerzo</option>
+            <option value="merienda">Merienda (Snack Tarde)</option>
+            <option value="cena">Cena</option>
+        </select>
+
+        <div id="meal-options"></div>
+    </div>
+
+    <script>
+        // Datos de opciones de comidas (hardcoded para simplicidad)
+        const mealOptions = {
+            desayuno: [
+                { protein: 'huevos', amount: '2-3 unidades', carb: 'avena', carbAmount: '40g', desc: 'Huevos revueltos con avena y frutas.' },
+                { protein: 'yogur', amount: '200g', carb: 'pan integral', carbAmount: '2 rebanadas', desc: 'Yogur griego con pan integral y nueces.' },
+                { protein: 'queso cottage', amount: '150g', carb: 'frutas', carbAmount: '1 pieza', desc: 'Queso cottage con frutas y semillas.' }
+            ],
+            colacion: [
+                { protein: 'nueces', amount: '30g', carb: 'manzana', carbAmount: '1 unidad', desc: 'Mezcla de nueces con una manzana.' },
+                { protein: 'yogur', amount: '150g', carb: 'bayas', carbAmount: '100g', desc: 'Yogur con bayas frescas.' },
+                { protein: 'barra proteica', amount: '1 unidad', carb: 'plátano', carbAmount: '1 unidad', desc: 'Barra proteica con plátano.' }
+            ],
+            almuerzo: [
+                { protein: 'carne magra', amount: '150g', carb: 'arroz', carbAmount: '100g', desc: 'Carne magra con arroz integral y vegetales.' },
+                { protein: 'pescado', amount: '150g', carb: 'papas', carbAmount: '200g', desc: 'Pescado a la plancha con papas al horno.' },
+                { protein: 'pechuga de pollo', amount: '150g', carb: 'fideos', carbAmount: '100g', desc: 'Pechuga de pollo con fideos integrales.' },
+                { protein: 'muslo de pollo', amount: '150g', carb: 'lentejas', carbAmount: '100g', desc: 'Muslo de pollo con lentejas y ensalada.' },
+                { protein: 'carne de cerdo', amount: '150g', carb: 'arroz', carbAmount: '100g', desc: 'Carne de cerdo magra con arroz y brócoli.' },
+                { protein: 'pescado', amount: '150g', carb: 'lentejas', carbAmount: '100g', desc: 'Pescado con lentejas y espinacas.' }
+            ],
+            merienda: [
+                { protein: 'queso', amount: '50g', carb: 'galletas integrales', carbAmount: '4 unidades', desc: 'Queso con galletas integrales.' },
+                { protein: 'hummus', amount: '100g', carb: 'zanahorias', carbAmount: '2 unidades', desc: 'Hummus con zanahorias.' },
+                { protein: 'batido proteico', amount: '1 porción', carb: 'frutas', carbAmount: '100g', desc: 'Batido proteico con frutas.' }
+            ],
+            cena: [
+                { protein: 'carne magra', amount: '150g', carb: 'papas', carbAmount: '200g', desc: 'Carne magra con papas y ensalada.' },
+                { protein: 'pescado', amount: '150g', carb: 'fideos', carbAmount: '100g', desc: 'Pescado con fideos y vegetales.' },
+                { protein: 'pechuga de pollo', amount: '150g', carb: 'lentejas', carbAmount: '100g', desc: 'Pechuga de pollo con lentejas.' },
+                { protein: 'muslo de pollo', amount: '150g', carb: 'arroz', carbAmount: '100g', desc: 'Muslo de pollo con arroz integral.' },
+                { protein: 'carne de cerdo', amount: '150g', carb: 'papas', carbAmount: '200g', desc: 'Carne de cerdo con papas al horno.' },
+                { protein: 'pescado', amount: '150g', carb: 'arroz', carbAmount: '100g', desc: 'Pescado con arroz y espárragos.' }
+            ]
+        };
+
+        // Fórmulas de cálculo (simplificadas y estándar)
+        function calculateBMI(weight, height) {
+            height = height / 100; // cm to m
+            return (weight / (height * height)).toFixed(2);
+        }
+
+        function calculateBMR(weight, height, age = 30, gender = 'male') { // Asumiendo edad 30 y masculino por defecto
+            return 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age); // Harris-Benedict para hombres
+        }
+
+        function calculateTDEE(bmr, trainingDays, trainingDuration, walks) {
+            let activityLevel = 1.2; // Sedentario por defecto
+            if (trainingDays >= 3) activityLevel = 1.55; // Moderado
+            if (trainingDays >= 5) activityLevel = 1.725; // Activo
+            activityLevel += (walks / 60 * 0.1); // Ajuste por caminatas
+            return bmr * activityLevel;
+        }
+
+        function calculateMacros(tdee, weight, meals) {
+            const proteins = (1.8 * weight).toFixed(0); // 1.8g/kg
+            const fats = (0.8 * weight).toFixed(0); // 0.8g/kg
+            const fiber = 30; // Fijo 30g
+            const carbs = ((tdee - (proteins * 4) - (fats * 9)) / 4 / meals).toFixed(0); // Carbs por comida approx
+            return { proteins, carbs: (carbs * meals).toFixed(0), fats, fiber };
+        }
+
+        // Manejo del formulario
+        const form = document.getElementById('user-form');
+        const results = document.getElementById('results');
+        const mealSelect = document.getElementById('meal-select');
+        const mealOptionsDiv = document.getElementById('meal-options');
+
+        let dailyMacros = {};
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const trainingDays = parseInt(document.getElementById('training-days').value);
+            const trainingDuration = parseInt(document.getElementById('training-duration').value);
+            const walks = parseInt(document.getElementById('walks').value);
+            const meals = parseInt(document.getElementById('meals').value);
+
+            const bmi = calculateBMI(weight, height);
+            const bmr = calculateBMR(weight, height);
+            const tdee = calculateTDEE(bmr, trainingDays, trainingDuration, walks);
+            dailyMacros = calculateMacros(tdee, weight, meals);
+
+            document.getElementById('bmi').textContent = `IMC: ${bmi}`;
+            document.getElementById('calories').textContent = `Calorías diarias estimadas: ${tdee.toFixed(0)} kcal`;
+            document.getElementById('proteins').textContent = `Proteínas diarias: ${dailyMacros.proteins}g`;
+            document.getElementById('carbs').textContent = `Carbohidratos diarios: ${dailyMacros.carbs}g`;
+            document.getElementById('fats').textContent = `Grasas saludables diarias: ${dailyMacros.fats}g`;
+            document.getElementById('fiber').textContent = `Fibra alimentaria diaria: ${dailyMacros.fiber}g`;
+
+            results.style.display = 'block';
+        });
+
+        mealSelect.addEventListener('change', (e) => {
+            const meal = e.target.value;
+            mealOptionsDiv.innerHTML = '';
+            if (meal && mealOptions[meal]) {
+                mealOptions[meal].forEach(option => {
+                    const div = document.createElement('div');
+                    div.classList.add('meal-option');
+                    // Ajustar cantidades basadas en macros (simplificado: dividir diario por comidas)
+                    const mealProteins = (dailyMacros.proteins / parseInt(document.getElementById('meals').value)).toFixed(0);
+                    const mealCarbs = (dailyMacros.carbs / parseInt(document.getElementById('meals').value)).toFixed(0);
+                    div.textContent = `${option.desc} - Proteína: ${mealProteins}g (${option.protein}), Carbs: ${mealCarbs}g (${option.carb})`;
+                    mealOptionsDiv.appendChild(div);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
